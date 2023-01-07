@@ -9,6 +9,7 @@
 *.csv
 ds_interview_chatbot_venv/
 logs/
+data/finetuning_validation_queue.json
 
 #################################### from https://github.com/github/gitignore/blob/main/Python.gitignore
 

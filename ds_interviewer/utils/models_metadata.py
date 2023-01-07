@@ -95,8 +95,9 @@ def get_model_metadata(model_name, model_version=None):
     if model_version:
         model_metadata = deepcopy(models_metadata[model_name]['models'][model_version])
     else:
-        model_metadata = deepcopy(models_metadata[model_name]['models'][models_metadata[model_name]['best_model_version']])
-    return model_metadata
+        model_version = models_metadata[model_name]['best_model_version']
+        model_metadata = deepcopy(models_metadata[model_name]['models'][model_version])
+    return model_metadata, model_version
 
 
 def add_new_model_version():

@@ -31,7 +31,7 @@ def share_conclusion_boilerplate(**kwargs):
 
 
 def ask_how_it_works(carryover_data, chat_history_by_section=[[]], **kwargs):
-    model_metadata = get_model_metadata('ask_how_it_works', kwargs["model_version"] if "model_version" in kwargs.keys() else None)
+    model_metadata, model_version = get_model_metadata('ask_how_it_works', kwargs["model_version"] if "model_version" in kwargs.keys() else None)
     prompt_args = dict(current_section_chat=prepare_chat_history(chat_history_by_section[-1]),
                        # how do i make this function handle any interview section, not just algo selection?
                       subject=carryover_data['algorithm_selection']['subject'],
@@ -49,6 +49,7 @@ def ask_how_it_works(carryover_data, chat_history_by_section=[[]], **kwargs):
     completion_args = parse(model_metadata['completion_template'], 
                             completion).named
     observation_details = dict(model_name="ask_how_it_works", 
+                               model_version=model_version,
                                prompt_template=model_metadata['prompt_template'], 
                                completion_template=model_metadata['completion_template'], 
                                prompt_args=prompt_args, 
@@ -64,7 +65,7 @@ def ask_how_it_works(carryover_data, chat_history_by_section=[[]], **kwargs):
 
 
 def validate_answer_how_it_works(carryover_data, chat_history_by_section=[[]], **kwargs):
-    model_metadata = get_model_metadata('validate_answer_how_it_works', kwargs["model_version"] if "model_version" in kwargs.keys() else None)
+    model_metadata, model_version = get_model_metadata('validate_answer_how_it_works', kwargs["model_version"] if "model_version" in kwargs.keys() else None)
     
     # prompt_template = models_metadata['ask_how_it_works'][-1]['prompt_template']
     prompt_args = dict(current_section_chat=prepare_chat_history(chat_history_by_section[-1]),
@@ -82,6 +83,7 @@ def validate_answer_how_it_works(carryover_data, chat_history_by_section=[[]], *
     completion_args = parse(model_metadata['completion_template'], 
                             completion).named
     observation_details = dict(model_name="validate_answer_how_it_works", 
+                               model_version=model_version,
                                prompt_template=model_metadata['prompt_template'], 
                                completion_template=model_metadata['completion_template'], 
                                prompt_args=prompt_args, 
