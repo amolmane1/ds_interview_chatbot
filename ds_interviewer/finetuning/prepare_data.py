@@ -142,6 +142,7 @@ def validate_observation_for_finetuning(observation_details):
 {2}
 ******************
 """
+    model_metadata, model_version = get_model_metadata(observation_details['model_name'], observation_details["model_version"] if "model_version" in observation_details.keys() else None)
     print(print_template.format(observation_details['model_name'], 
                                 observation_details['prompt'], 
                                 observation_details['completion']))
