@@ -133,6 +133,12 @@ def get_label_for_routing_answer_completion():
     return label
 
 
+def get_user_input(prompt="Applicant: "):
+    user_input = input(prompt)
+    new_chat_line = prompt + user_input
+    return new_chat_line
+
+
 def create_openai_completion(prompt, args=default_arguments_for_openai_generation):
     gpt_response = openai.Completion.create(
             prompt=prompt,
@@ -156,6 +162,10 @@ tags_map = {
 'vj': 'validate jim',
 'va': 'validate applicant',
 }
+
+
+# def get_subject_for_node_function(carryover_data, ):
+    
 
 
 def prepare_chat_history(chat_history=[], max_length=800, empty_value='NA'):
