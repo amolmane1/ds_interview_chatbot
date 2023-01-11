@@ -40,14 +40,14 @@ def add_new_model_version(model_name, new_model_version_metadata, set_as_best_mo
         # add data, set as best model version
         models_metadata[model_name] = deepcopy(new_model_template)
         models_metadata[model_name]['best_model_version'] = model_version
-        models_metadata[model_name]['models'][model_version] = new_model_version_metadata
     else:
         number_of_models_made_on_the_same_day = len([v for v in models_metadata[model_name]['models'].keys() if model_version in v])
-        model_version += "-" + str(number_of_models_made_on_the_same_day)
-        
-        models_metadata[model_name]['models'][model_version] = new_model_version_metadata
+        model_version += "-" + str(number_of_models_made_on_the_same_day)        
         if set_as_best_model_version:
             models_metadata[model_name]['best_model_version'] = model_version
+    
+    models_metadata[model_name]['models'][model_version] = new_model_version_metadata
+    models_metadata[model_name]['models'][model_version]['model_version'] = model_version
 
     with open(models_metadata_file_path, 'w') as file:
         json.dump(models_metadata, file)
