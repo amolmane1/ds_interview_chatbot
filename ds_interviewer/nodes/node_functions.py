@@ -30,23 +30,23 @@ def share_conclusion_boilerplate(**kwargs):
                 new_chat_lines=new_chat_lines) 
 
 
-def ask_what_you_did(current_section_name, current_node_name, carryover_data, validate_async=True, chat_history_by_section=[[]], **kwargs):
-    model_metadata, model_version = get_model_metadata('ask_what_you_did', kwargs["model_version"] if "model_version" in kwargs.keys() else None)
+def ask_what_applicant_did(current_section_name, carryover_data, validate_async=True, chat_history_by_section=[[]], **kwargs):
+    model_metadata, model_version = get_model_metadata('ask_what_applicant_did', kwargs["model_version"] if "model_version" in kwargs.keys() else None)
     prompt_args = dict(
         current_section_chat=prepare_chat_history(chat_history_by_section[-1]),
                       subject=current_section_name,
                       is_completion_correct=1)
     observation_prompt = model_metadata['prompt_template'].format(**prompt_args)
     
-    kshot_prompt = prepare_kshot_prompt_using_levenshtein_distance(model_name='ask_what_you_did', 
+    kshot_prompt = prepare_kshot_prompt_using_levenshtein_distance(model_name='ask_what_applicant_did', 
                                                                    model_metadata=model_metadata, 
                                                                    prompt_args=prompt_args, 
                                                                    observation_prompt=observation_prompt)
     completion = create_openai_completion(kshot_prompt, args=default_arguments_for_openai_generation)
-    print("completion: " + completion)
+    
     completion_args = parse(model_metadata['completion_template'], 
                             completion).named
-    observation_details = dict(model_name="ask_what_you_did", 
+    observation_details = dict(model_name="ask_what_applicant_did", 
                                model_version=model_version,
                                prompt_template=model_metadata['prompt_template'], 
                                completion_template=model_metadata['completion_template'], 
@@ -64,11 +64,12 @@ def ask_what_you_did(current_section_name, current_node_name, carryover_data, va
                 new_chat_lines=new_chat_lines)
 
 
-def ask_how_it_works(current_section_name, current_node_name, carryover_data, validate_async=True, chat_history_by_section=[[]], **kwargs):
-    model_metadata, model_version = get_model_metadata('ask_how_it_works', kwargs["model_version"] if "model_version" in kwargs.keys() else None)
+def ask_how_it_works(current_section_name, carryover_data, validate_async=True, chat_history_by_section=[[]], **kwargs):
+    model_metadata, model_version = get_model_metadata('ask_how_it_works', kwargs["model_version"] if "model_version" in kwargs else None)
     prompt_args = dict(current_section_chat=prepare_chat_history(chat_history_by_section[-1]),
                       # subject=carryover_data[current_section_name]['ask_what_you_did']['subject'],
-                      subject="NA",
+                      # subject="NA",
+                       subject=kwargs['subject'] if 'subject' in kwargs else 'NA',
                       question_type="how it works",
                       is_completion_correct=1)
     observation_prompt = model_metadata['prompt_template'].format(**prompt_args)
@@ -99,7 +100,7 @@ def ask_how_it_works(current_section_name, current_node_name, carryover_data, va
                 new_chat_lines=new_chat_lines)
 
 
-def validate_answer_how_it_works(current_section_name, current_node_name, carryover_data, validate_async=True, chat_history_by_section=[[]], **kwargs):
+def validate_answer_how_it_works(current_section_name, carryover_data, validate_async=True, chat_history_by_section=[[]], **kwargs):
     model_metadata, model_version = get_model_metadata('validate_answer_how_it_works', kwargs["model_version"] if "model_version" in kwargs.keys() else None)
     
     prompt_args = dict(current_section_chat=prepare_chat_history(chat_history_by_section[-1]),
@@ -132,9 +133,9 @@ def validate_answer_how_it_works(current_section_name, current_node_name, carryo
                 new_chat_lines=None)
 
 
-def clarify_question_on_how_it_works(current_section, current_node, carryover_data, validate_async=True, chat_history_by_section=[[]], kwargs={}):
+def clarify_question_on_how_it_works(current_section_name, carryover_data, validate_async=True, chat_history_by_section=[[]], kwargs={}):
     pass
 
 
-def ask_followup_question_on_how_it_works(current_section, current_node, carryover_data, validate_async=True, chat_history_by_section=[[]], kwargs={}):
+def ask_followup_question_on_how_it_works(current_section_name, carryover_data, validate_async=True, chat_history_by_section=[[]], kwargs={}):
     pass

@@ -104,27 +104,66 @@ def create_interview_flowchart2():
 
     section_graph = nx.MultiDiGraph()
     section_graph.add_node("share_introduction_boilerplate", function=share_introduction_boilerplate, function_args={})
-    # section_graph.add_node(share_introduction_boilerplate, function_args={})
     interview_graph.nodes["introduction"]['graph'] = section_graph
 
     section_graph = nx.MultiDiGraph()
-    section_graph.add_node("ask_what_you_did", function=ask_what_you_did, function_args={})
+    # section_graph.add_node("confirm_what_applicant_did", function=confirm_what_applicant_did, function_args={})
+    # section_graph.add_node("route_answer_to-confirm_what_applicant_did", function=confirm_what_applicant_did, function_args={})
+    section_graph.add_node("ask_what_applicant_did", function=ask_what_applicant_did, function_args={})
     section_graph.add_node("ask_how_it_works", function=ask_how_it_works, function_args={})
     section_graph.add_node("validate_answer_how_it_works", function=validate_answer_how_it_works, function_args={})
-    section_graph.add_edge("ask_what_you_did", "ask_how_it_works")
+    section_graph.add_edge("ask_what_applicant_did", "ask_how_it_works")
     section_graph.add_edge("ask_how_it_works", "validate_answer_how_it_works")
     interview_graph.nodes["algorithm selection"]['graph'] = section_graph
 
     section_graph = nx.MultiDiGraph()
-    section_graph.add_node("ask_what_you_did", function=ask_what_you_did, function_args={})
+    section_graph.add_node("ask_what_applicant_did", function=ask_what_applicant_did, function_args={})
     section_graph.add_node("ask_how_it_works", function=ask_how_it_works, function_args={})
     section_graph.add_node("validate_answer_how_it_works", function=validate_answer_how_it_works, function_args={})
-    section_graph.add_edge("ask_what_you_did", "ask_how_it_works")
+    section_graph.add_edge("ask_what_applicant_did", "ask_how_it_works")
     section_graph.add_edge("ask_how_it_works", "validate_answer_how_it_works")
     interview_graph.nodes["dealing with categorical values"]['graph'] = section_graph
 
     section_graph = nx.MultiDiGraph()
-    # section_graph.add_node("share_introduction_boilerplate", function=share_introduction_boilerplate, function_args={})
+    section_graph.add_node("share_conclusion_boilerplate", function=share_conclusion_boilerplate, function_args={})
+    interview_graph.nodes["conclusion"]['graph'] = section_graph
+    
+    return interview_graph
+
+
+def create_interview_flowchart3():
+    interview_graph = nx.MultiDiGraph()
+    interview_graph.add_node("introduction")
+    interview_graph.add_node("algorithm selection")
+    interview_graph.add_node("dealing with categorical values")
+    interview_graph.add_node("conclusion")
+    interview_graph.add_edge("introduction", "algorithm selection")
+    interview_graph.add_edge("algorithm selection", "dealing with categorical values")
+    interview_graph.add_edge("dealing with categorical values", "conclusion")
+
+    section_graph = nx.MultiDiGraph()
+    section_graph.add_node("share_introduction_boilerplate", function=share_introduction_boilerplate, function_args={})
+    interview_graph.nodes["introduction"]['graph'] = section_graph
+
+    section_graph = nx.MultiDiGraph()
+    # section_graph.add_node("confirm_what_applicant_did", function=confirm_what_applicant_did, function_args={})
+    # section_graph.add_node("route_answer_to-confirm_what_applicant_did", function=confirm_what_applicant_did, function_args={})
+    section_graph.add_node("ask_what_applicant_did", function=ask_what_applicant_did, function_args={})
+    section_graph.add_node("ask_how_it_works", function=ask_how_it_works, function_args={})
+    section_graph.add_node("validate_answer_how_it_works", function=validate_answer_how_it_works, function_args={})
+    section_graph.add_edge("ask_what_applicant_did", "ask_how_it_works")
+    section_graph.add_edge("ask_how_it_works", "validate_answer_how_it_works")
+    interview_graph.nodes["algorithm selection"]['graph'] = section_graph
+
+    section_graph = nx.MultiDiGraph()
+    section_graph.add_node("ask_what_applicant_did", function=ask_what_applicant_did, function_args={})
+    section_graph.add_node("ask_how_it_works", function=ask_how_it_works, function_args={})
+    section_graph.add_node("validate_answer_how_it_works", function=validate_answer_how_it_works, function_args={})
+    section_graph.add_edge("ask_what_applicant_did", "ask_how_it_works")
+    section_graph.add_edge("ask_how_it_works", "validate_answer_how_it_works")
+    interview_graph.nodes["dealing with categorical values"]['graph'] = section_graph
+
+    section_graph = nx.MultiDiGraph()
     section_graph.add_node("share_conclusion_boilerplate", function=share_conclusion_boilerplate, function_args={})
     interview_graph.nodes["conclusion"]['graph'] = section_graph
     
