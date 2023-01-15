@@ -42,12 +42,14 @@ def create_interview_flowchart():
     section_graph.add_node("ask_what_applicant_did", function=ask_what_applicant_did, function_args={})
     section_graph.add_node("ask_how_it_works", function=ask_how_it_works, function_args={})
     section_graph.add_node("validate_answer_how_it_works", function=validate_answer_how_it_works, function_args={})
+    section_graph.add_node("ask_what_other_options_applicant_considered", function=ask_what_other_options_applicant_considered, function_args={})
     
     section_graph.add_edge("confirm_what_applicant_did", "route_answer_to_confirm_what_applicant_did")
     section_graph.add_edge("route_answer_to_confirm_what_applicant_did", "ask_what_applicant_did", passthrough_values=[0])
     section_graph.add_edge("route_answer_to_confirm_what_applicant_did", "ask_how_it_works", passthrough_values=[1])
     section_graph.add_edge("ask_what_applicant_did", "ask_how_it_works")
     section_graph.add_edge("ask_how_it_works", "validate_answer_how_it_works")
+    section_graph.add_edge("validate_answer_how_it_works", "ask_what_other_options_applicant_considered")
     
     interview_graph.nodes["algorithm selection"]['graph'] = section_graph
 
@@ -59,12 +61,14 @@ def create_interview_flowchart():
     section_graph.add_node("ask_what_applicant_did", function=ask_what_applicant_did, function_args={})
     section_graph.add_node("ask_how_it_works", function=ask_how_it_works, function_args={})
     section_graph.add_node("validate_answer_how_it_works", function=validate_answer_how_it_works, function_args={})
+    section_graph.add_node("ask_what_other_options_applicant_considered", function=ask_what_other_options_applicant_considered, function_args={})
     
     section_graph.add_edge("confirm_what_applicant_did", "route_answer_to_confirm_what_applicant_did")
     section_graph.add_edge("route_answer_to_confirm_what_applicant_did", "ask_what_applicant_did", passthrough_values=[0])
     section_graph.add_edge("route_answer_to_confirm_what_applicant_did", "ask_how_it_works", passthrough_values=[1])
     section_graph.add_edge("ask_what_applicant_did", "ask_how_it_works")
     section_graph.add_edge("ask_how_it_works", "validate_answer_how_it_works")
+    section_graph.add_edge("validate_answer_how_it_works", "ask_what_other_options_applicant_considered")
     
     interview_graph.nodes["dealing with categorical values"]['graph'] = section_graph
 

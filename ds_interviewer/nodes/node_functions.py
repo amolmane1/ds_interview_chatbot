@@ -1,4 +1,3 @@
-from prompt_templates import kshot_prompt_templates
 from utils.utils import log_completion_call, default_arguments_for_openai_classification, default_arguments_for_openai_generation, default_arguments_for_openai_validation, \
     ask_gpt, get_feedback, ask_gpt_get_feedback_and_log, create_openai_completion, get_label_for_correct_or_incorrect_completion, path_to_finetuning_data_folder, \
     prepare_chat_history, prepare_kshot_prompt_using_levenshtein_distance, get_user_input
@@ -197,6 +196,39 @@ def validate_answer_how_it_works(current_section_name, carryover_data, validate_
     routing_value = int(completion_args_to_use_for_interview['validation_of_response'])
     return dict(routing_value=routing_value, 
                 new_chat_lines=None)
+
+
+def ask_what_other_options_applicant_considered(carryover_data, validate_async=True, chat_history_by_section=[[]], **kwargs):
+    model_name = "ask_what_other_options_applicant_considered"
+    model_metadata, model_version = get_model_metadata(model_name, kwargs["model_version"] if "model_version" in kwargs else None)
+    prompt_args = dict(current_section_chat=prepare_chat_history(chat_history_by_section[-1]),
+                      is_completion_correct=1)
+    observation_prompt = model_metadata['prompt_template'].format(**prompt_args)
+    
+    kshot_prompt = prepare_kshot_prompt_using_levenshtein_distance(model_name=model_name, 
+                                                                   model_metadata=model_metadata, 
+                                                                   prompt_args=prompt_args, 
+                                                                   observation_prompt=observation_prompt)
+    completion = create_openai_completion(kshot_prompt, args=default_arguments_for_openai_generation)
+    
+    completion_args = parse(model_metadata['completion_template'], 
+                            completion).named
+    observation_details = dict(model_name=model_name, 
+                               model_version=model_version,
+                               prompt_template=model_metadata['prompt_template'], 
+                               completion_template=model_metadata['completion_template'], 
+                               prompt_args=prompt_args, 
+                               completion_args=completion_args,
+                               prompt = observation_prompt,
+                               completion=completion)
+    completion_args_to_use_for_interview = submit_observation_for_finetuning_validation(observation_details, 
+                                                                                        validate_async=validate_async)
+
+    new_chat_lines = []
+    new_chat_lines.append("Interviewer: " + completion_args_to_use_for_interview['interviewer_dialogue'])
+    new_chat_lines.append(get_user_input())
+    return dict(routing_value=None, 
+                new_chat_lines=new_chat_lines)
 
 
 def clarify_question_on_how_it_works(current_section_name, carryover_data, validate_async=True, chat_history_by_section=[[]], kwargs={}):
