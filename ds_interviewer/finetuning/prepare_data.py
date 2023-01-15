@@ -220,20 +220,24 @@ def validate_observations_for_finetuning_from_queue():
         with open(file_path, 'r') as file:
             finetuning_validation_queue = json.load(file)
         
-        indices_of_validated_observations = []
+        if len(finetuning_validation_queue) == 0:
+            print("No observations in queue to validate.")
         
-        for i, observation_details in enumerate(finetuning_validation_queue):
-            result = validate_observation_for_finetuning(observation_details)
-            if result['validated']:
-                indices_of_validated_observations.append(i)
-            
-            continue_validating = int(input("Continue validating from queue? (1/0): "))
-            if not continue_validating:
-                break
-        
-        # remove all observations that have been validated from the queue
-        finetuning_validation_queue = [observation_details for i, observation_details in enumerate(finetuning_validation_queue) if i not in indices_of_validated_observations]
-        
+        else:
+            indices_of_validated_observations = []
+
+            for i, observation_details in enumerate(finetuning_validation_queue):
+                result = validate_observation_for_finetuning(observation_details)
+                if result['validated']:
+                    indices_of_validated_observations.append(i)
+
+                continue_validating = int(input("Continue validating from queue? (1/0): "))
+                if not continue_validating:
+                    break
+
+            # remove all observations that have been validated from the queue
+            finetuning_validation_queue = [observation_details for i, observation_details in enumerate(finetuning_validation_queue) if i not in indices_of_validated_observations]
+
         with open(file_path, 'w') as file:
             json.dump(finetuning_validation_queue, file)
 
