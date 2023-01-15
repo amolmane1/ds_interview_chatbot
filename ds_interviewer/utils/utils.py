@@ -11,13 +11,13 @@ from jellyfish import levenshtein_distance
 from utils.models_metadata import get_model_metadata
 
 openai.api_key = os.getenv("OPENAI_API_KEY")
-logging.basicConfig(filename='/Users/amolmane/Documents/ds_interview_chatbot/logs/gpt3_playground.log', 
+logging.basicConfig(filename='/Users/amolmane/Documents/ds_interview_chatbot/logs/orchestrator_v0.2.log', 
                     format='%(asctime)s - %(levelname)s:\n%(message)s\n*************************************************************************\n\n', 
                     datefmt="%m/%d/%Y %I:%M:%S %p %Z",
                    level=logging.INFO)
 
 
-def log_completion_call(args, running_prompt, gpt_response, topic='misc', tag='', label='', reason='', notes='', insights=''):
+def log_completion_and_feedback(args, running_prompt, gpt_response, topic='misc', tag='', label='', reason='', notes='', insights=''):
     logging.info(
 """Parameters:
 {0}
@@ -41,6 +41,19 @@ Insights: {7}
             label, 
             reason,
             insights))
+    
+    
+def log_completion(prompt, completion):
+    logging.info(
+"""***************
+Prompt:
+{0}
+***************
+Completion:
+{1}
+***************
+""".format(prompt,
+           completion))
 
 
 path_to_finetuning_data_folder = "../data/fine_tuning_data/"
@@ -108,7 +121,7 @@ def get_feedback(starting_tag):
 def ask_gpt_get_feedback_and_log(prompt, topic='misc', args=default_arguments_for_openai_generation, starting_tag=''):
     gpt_response = ask_gpt(prompt, args)
     tag, label, reason, insights = get_feedback(starting_tag)
-    log_completion_call(args, prompt, gpt_response, topic, tag=tag, label=label, reason=reason, insights=insights)
+    log_completion_and_feedback(args, prompt, gpt_response, topic, tag=tag, label=label, reason=reason, insights=insights)
     return gpt_response
 
 
@@ -140,11 +153,12 @@ def get_user_input(prompt="Applicant: "):
 
 
 def create_openai_completion(prompt, args=default_arguments_for_openai_generation):
-    gpt_response = openai.Completion.create(
+    completion = openai.Completion.create(
             prompt=prompt,
             **args
         ).choices[0].text.strip()
-    return gpt_response
+    log_completion(prompt, completion)
+    return completion
 
 
 tags_map = {

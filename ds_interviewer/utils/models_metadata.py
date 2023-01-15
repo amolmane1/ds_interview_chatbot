@@ -57,6 +57,11 @@ def update_model_best_version(model_name, model_version):
     pass
 
 
+# def update_model_name:
+#     # change name in models metadata
+#     # change all finetuning dataset names for that model
+
+
 # def add_new_model(model_name, new_model_version_metadata):
 #     """
 #     new_model_version_metadata: dict, should have the keys in new_model_version_metadata_template and appropriate values 
