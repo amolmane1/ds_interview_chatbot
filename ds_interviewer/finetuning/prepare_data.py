@@ -194,7 +194,8 @@ def submit_observation_for_finetuning_validation(observation_details, validate_a
         finetuning_validation_queue = []
 
     finetuning_validation_queue.append(observation_details)
-
+    # TODO: save queue to file before validating live and then load again, in case an error occurs and kills the program.
+    
     if not validate_async:
         result = validate_observation_for_finetuning(observation_details)
         if result['validated']:
