@@ -231,7 +231,6 @@ def prepare_kshot_prompt_using_levenshtein_distance(model_name, model_metadata, 
     folder_path = Path("{0}{1}/".format(path_to_finetuning_data_folder, model_name))
     raw_file_name = "raw_finetuning_data-model_{model_name}.csv".format(model_name=model_name)
     raw_file_path = Path("{0}/{1}".format(folder_path, raw_file_name))
-    raw_finetuning_dataset = pd.read_csv(raw_file_path, keep_default_na=False)
     
     # Get kshot instructions from models metadata = kshot-prompt
     kshot_prompt = model_metadata['kshot_header']
@@ -244,36 +243,39 @@ def prepare_kshot_prompt_using_levenshtein_distance(model_name, model_metadata, 
     kshot_prompt_length = len(kshot_prompt) + len(observation_prompt)
     max_length = max_tokens * 4
     
-    # Rank csv observations by Levenshtein distance to prompt args = ranked obs
-    prompt_args_json = json.dumps(prompt_args)
-    levenshtein_distances = pd.DataFrame(raw_finetuning_dataset.apply(
-        func=calculate_levenshtein_distance_for_intersecting_args, 
-        axis=1, 
-        prompt_args=prompt_args,
-        prompt_args_json=prompt_args_json),
-                                         columns=['distance'])
-    # sort rows by distance in ascending order
-    levenshtein_distances.sort_values(by='distance', inplace=True)
-    
-    # iterate through ranked obs:
-    for i in range(len(levenshtein_distances)):
-        # get relevant row from raw_finetuning_dataset
-        id_of_raw_finetuning_dataset = levenshtein_distances.index[i]
-        row = raw_finetuning_dataset.loc[id_of_raw_finetuning_dataset]
+    if raw_file_path.is_file():
+        raw_finetuning_dataset = pd.read_csv(raw_file_path, keep_default_na=False)
         
-        # prepare observation
-        historical_observation = format_observation_template_with_args(row, 
-                                                                       model_metadata['prompt_template'], 
-                                                                       model_metadata['completion_template'])
-        formatted_historical_observation = historical_observation + "\n\n\n"
-        
-        # If that obs plus kshot prompt length > max length, don't add it to the kshot prompt. break
-        if len(formatted_historical_observation) + kshot_prompt_length > max_length:
-            break
-        # Else, add to kshot-prompt and Update kshot-prompt length
-        else:
-            kshot_prompt += formatted_historical_observation
-            kshot_prompt_length += len(formatted_historical_observation)
+        # Rank csv observations by Levenshtein distance to prompt args = ranked obs
+        prompt_args_json = json.dumps(prompt_args)
+        levenshtein_distances = pd.DataFrame(raw_finetuning_dataset.apply(
+            func=calculate_levenshtein_distance_for_intersecting_args, 
+            axis=1, 
+            prompt_args=prompt_args,
+            prompt_args_json=prompt_args_json),
+                                             columns=['distance'])
+        # sort rows by distance in ascending order
+        levenshtein_distances.sort_values(by='distance', inplace=True)
+
+        # iterate through ranked obs:
+        for i in range(len(levenshtein_distances)):
+            # get relevant row from raw_finetuning_dataset
+            id_of_raw_finetuning_dataset = levenshtein_distances.index[i]
+            row = raw_finetuning_dataset.loc[id_of_raw_finetuning_dataset]
+
+            # prepare observation
+            historical_observation = format_observation_template_with_args(row, 
+                                                                           model_metadata['prompt_template'], 
+                                                                           model_metadata['completion_template'])
+            formatted_historical_observation = historical_observation + "\n\n\n"
+
+            # If that obs plus kshot prompt length > max length, don't add it to the kshot prompt. break
+            if len(formatted_historical_observation) + kshot_prompt_length > max_length:
+                break
+            # Else, add to kshot-prompt and Update kshot-prompt length
+            else:
+                kshot_prompt += formatted_historical_observation
+                kshot_prompt_length += len(formatted_historical_observation)
     
     # add the prompt that we want openai to complete to kshot-prompt
     kshot_prompt += observation_prompt
@@ -281,3 +283,7 @@ def prepare_kshot_prompt_using_levenshtein_distance(model_name, model_metadata, 
     
     return kshot_prompt
 
+
+# def identify_what_applicant_has_done_in_ipynb():
+#     applicant_approaches_json = json.dumps(applicant_approaches)
+#     return applicant_approaches_json
