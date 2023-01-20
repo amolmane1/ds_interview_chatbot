@@ -12,7 +12,8 @@ new_model_version_metadata_template = {
     'prompt_template': None,
     'completion_template': None,
     'kshot_header': None,
-    'finetuned_model_name': None
+    'finetuned_model_name': None,
+    'stop_sequence': None
 }
 
 
@@ -54,31 +55,16 @@ def add_new_model_version(model_name, new_model_version_metadata, set_as_best_mo
 
 
 def update_model_best_version(model_name, model_version):
-    pass
-
+    with open(models_metadata_file_path, 'r') as file:
+        models_metadata = json.load(file)
+    
+    assert model_version in models_metadata[model_name]['models']
+    
+    models_metadata[model_name]['best_model_version'] = model_version
+    
+    with open(models_metadata_file_path, 'w') as file:
+        json.dump(models_metadata, file)
 
 # def update_model_name:
 #     # change name in models metadata
 #     # change all finetuning dataset names for that model
-
-
-# def add_new_model(model_name, new_model_version_metadata):
-#     """
-#     new_model_version_metadata: dict, should have the keys in new_model_version_metadata_template and appropriate values 
-#     """
-#     with open(models_metadata_file_path, 'r') as file:
-#         models_metadata = json.load(file)
-    
-#     if model_name in models_metadata.keys():
-#         print("there is already a model called {} in models_metadata. Use add_new_model_version() instead.".format(model_name))
-#         return
-        
-#     model_version = datetime.today().strftime('%d.%m.%y')
-    
-#     models_metadata[model_name] = deepcopy(new_model_template)
-#     models_metadata[model_name]['best_model_version'] = model_version
-#     models_metadata[model_name]['models'][model_version] = new_model_version_metadata
-
-#     with open(models_metadata_file_path, 'w') as file:
-#         json.dump(models_metadata, file)
-

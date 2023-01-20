@@ -152,7 +152,8 @@ def get_user_input(prompt="Applicant: "):
     return new_chat_line
 
 
-def create_openai_completion(prompt, args=default_arguments_for_openai_generation):
+def create_openai_completion(prompt, stop_sequence=None, args=default_arguments_for_openai_generation):
+    args['stop'] = stop_sequence
     completion = openai.Completion.create(
             prompt=prompt,
             **args
@@ -243,6 +244,8 @@ def prepare_kshot_prompt_using_levenshtein_distance(model_name, model_metadata, 
     kshot_prompt_length = len(kshot_prompt) + len(observation_prompt)
     max_length = max_tokens * 4
     
+    stop_sequence = model_metadata['stop_sequence'] if model_metadata['stop_sequence'] is not None else ""
+    
     if raw_file_path.is_file():
         raw_finetuning_dataset = pd.read_csv(raw_file_path, keep_default_na=False)
         
@@ -267,7 +270,7 @@ def prepare_kshot_prompt_using_levenshtein_distance(model_name, model_metadata, 
             historical_observation = format_observation_template_with_args(row, 
                                                                            model_metadata['prompt_template'], 
                                                                            model_metadata['completion_template'])
-            formatted_historical_observation = historical_observation + "\n\n\n"
+            formatted_historical_observation = historical_observation + stop_sequence + "\n\n\n"
 
             # If that obs plus kshot prompt length > max length, don't add it to the kshot prompt. break
             if len(formatted_historical_observation) + kshot_prompt_length > max_length:
