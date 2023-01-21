@@ -8,7 +8,6 @@ new_model_template = {
     'models': {}
 }
 new_model_version_metadata_template = {
-    'model_version': None,
     'prompt_template': None,
     'completion_template': None,
     'kshot_header': None,
@@ -48,6 +47,7 @@ def add_new_model_version(model_name, new_model_version_metadata, set_as_best_mo
             models_metadata[model_name]['best_model_version'] = model_version
     
     models_metadata[model_name]['models'][model_version] = new_model_version_metadata
+    models_metadata[model_name]['models'][model_version]['model_name'] = model_name
     models_metadata[model_name]['models'][model_version]['model_version'] = model_version
 
     with open(models_metadata_file_path, 'w') as file:

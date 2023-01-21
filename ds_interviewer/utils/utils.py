@@ -43,17 +43,27 @@ Insights: {7}
             insights))
     
     
-def log_completion(prompt, completion):
+def log_completion(prompt, completion, args, model_metadata):
     logging.info(
 """***************
+Model Name & version:
+{model_name}
+{model_version}
+***************
+Args:
+{args}
+***************
 Prompt:
-{0}
+{prompt}
 ***************
 Completion:
-{1}
+{completion}
 ***************
-""".format(prompt,
-           completion))
+""".format(**dict(model_name=model_metadata['model_name'], 
+                model_version=model_metadata['model_version'],
+                args=args,
+                prompt=prompt,
+                completion=completion)))
 
 
 path_to_finetuning_data_folder = "../data/fine_tuning_data/"
@@ -94,17 +104,6 @@ def get_default_args(func):
         for k, v in signature.parameters.items()
         if v.default is not inspect.Parameter.empty
     }
-
-
-def ask_gpt(prompt, args=default_arguments_for_openai_generation, to_print=False):
-    gpt_response = openai.Completion.create(
-            prompt=prompt,
-            **args
-        ).choices[0].text.lstrip()
-    if to_print:
-        clear_output()
-        print("{0}{1}".format(prompt, gpt_response))
-    return gpt_response
 
 
 def get_feedback(starting_tag):
@@ -152,13 +151,15 @@ def get_user_input(prompt="Applicant: "):
     return new_chat_line
 
 
-def create_openai_completion(prompt, stop_sequence=None, args=default_arguments_for_openai_generation):
-    args['stop'] = stop_sequence
+def create_openai_completion(prompt, model_metadata=None, args=default_arguments_for_openai_generation, log=True):
+    if model_metadata is not None:
+        args['stop'] = model_metadata['stop_sequence']
     completion = openai.Completion.create(
             prompt=prompt,
             **args
         ).choices[0].text.strip()
-    log_completion(prompt, completion)
+    if log:
+        log_completion(prompt, completion, args, model_metadata)
     return completion
 
 
