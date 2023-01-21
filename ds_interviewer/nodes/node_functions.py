@@ -36,7 +36,7 @@ def get_response_from_applicant_persona(carryover_data, validate_async=True, cha
                                                                    model_metadata=model_metadata, 
                                                                    prompt_args=prompt_args, 
                                                                    observation_prompt=observation_prompt)
-    completion = create_openai_completion(kshot_prompt, stop_sequence=model_metadata['stop_sequence'], args=default_arguments_for_openai_generation)
+    completion = create_openai_completion(kshot_prompt, model_metadata=model_metadata, args=default_arguments_for_openai_generation)
 
     completion_args = parse(model_metadata['completion_template'], 
                             completion).named
@@ -77,7 +77,7 @@ def confirm_what_applicant_did(current_section_name, context, carryover_data, va
                                                                    model_metadata=model_metadata, 
                                                                    prompt_args=prompt_args, 
                                                                    observation_prompt=observation_prompt)
-    completion = create_openai_completion(kshot_prompt, stop_sequence=model_metadata['stop_sequence'], args=default_arguments_for_openai_generation)
+    completion = create_openai_completion(kshot_prompt, model_metadata=model_metadata, args=default_arguments_for_openai_generation)
 
     completion_args = parse(model_metadata['completion_template'], 
                             completion).named
@@ -111,7 +111,7 @@ def route_answer_to_confirm_what_applicant_did(validate_async=True, chat_history
                                                                    model_metadata=model_metadata, 
                                                                    prompt_args=prompt_args, 
                                                                    observation_prompt=observation_prompt)
-    completion = create_openai_completion(kshot_prompt, stop_sequence=model_metadata['stop_sequence'], args=default_arguments_for_openai_validation)
+    completion = create_openai_completion(kshot_prompt, model_metadata=model_metadata, args=default_arguments_for_openai_validation)
 
     completion_args = parse(model_metadata['completion_template'], 
                             completion).named
@@ -144,7 +144,7 @@ def ask_what_applicant_did(current_section_name, carryover_data, validate_async=
                                                                    model_metadata=model_metadata, 
                                                                    prompt_args=prompt_args, 
                                                                    observation_prompt=observation_prompt)
-    completion = create_openai_completion(kshot_prompt, stop_sequence=model_metadata['stop_sequence'], args=default_arguments_for_openai_generation)
+    completion = create_openai_completion(kshot_prompt, model_metadata=model_metadata, args=default_arguments_for_openai_generation)
     
     completion_args = parse(model_metadata['completion_template'], 
                             completion).named
@@ -178,7 +178,7 @@ def route_answer_to_ask_what_applicant_did(validate_async=True, chat_history_by_
                                                                    model_metadata=model_metadata, 
                                                                    prompt_args=prompt_args, 
                                                                    observation_prompt=observation_prompt)
-    completion = create_openai_completion(kshot_prompt, stop_sequence=model_metadata['stop_sequence'], args=default_arguments_for_openai_validation)
+    completion = create_openai_completion(kshot_prompt, model_metadata=model_metadata, args=default_arguments_for_openai_validation)
 
     completion_args = parse(model_metadata['completion_template'], 
                             completion).named
@@ -211,7 +211,7 @@ def ask_how_it_works(current_section_name, carryover_data, validate_async=True, 
                                                                    model_metadata=model_metadata, 
                                                                    prompt_args=prompt_args, 
                                                                    observation_prompt=observation_prompt)
-    completion = create_openai_completion(kshot_prompt, stop_sequence=model_metadata['stop_sequence'], args=default_arguments_for_openai_generation)
+    completion = create_openai_completion(kshot_prompt, model_metadata=model_metadata, args=default_arguments_for_openai_generation)
     
     completion_args = parse(model_metadata['completion_template'], 
                             completion).named
@@ -246,7 +246,7 @@ def validate_answer_how_it_works(current_section_name, carryover_data, validate_
                                                                model_metadata=model_metadata, 
                                                                prompt_args=prompt_args, 
                                                                observation_prompt=observation_prompt)
-    completion = create_openai_completion(kshot_prompt, stop_sequence=model_metadata['stop_sequence'], args=default_arguments_for_openai_validation)
+    completion = create_openai_completion(kshot_prompt, model_metadata=model_metadata, args=default_arguments_for_openai_validation)
     
     # this assumes completion always follows the template. what if it doesn't?
     completion_args = parse(model_metadata['completion_template'], 
@@ -279,7 +279,7 @@ def route_answer_to_what_other_options_applicant_considered(carryover_data, vali
                                                                    model_metadata=model_metadata, 
                                                                    prompt_args=prompt_args, 
                                                                    observation_prompt=observation_prompt)
-    completion = create_openai_completion(kshot_prompt, stop_sequence=model_metadata['stop_sequence'], args=default_arguments_for_openai_validation)
+    completion = create_openai_completion(kshot_prompt, model_metadata=model_metadata, args=default_arguments_for_openai_validation)
 
     completion_args = parse(model_metadata['completion_template'], 
                             completion).named
@@ -310,7 +310,7 @@ def ask_what_other_options_applicant_considered(carryover_data, validate_async=T
                                                                    model_metadata=model_metadata, 
                                                                    prompt_args=prompt_args, 
                                                                    observation_prompt=observation_prompt)
-    completion = create_openai_completion(kshot_prompt, stop_sequence=model_metadata['stop_sequence'], args=default_arguments_for_openai_generation)
+    completion = create_openai_completion(kshot_prompt, model_metadata=model_metadata, args=default_arguments_for_openai_generation)
     
     completion_args = parse(model_metadata['completion_template'], 
                             completion).named
