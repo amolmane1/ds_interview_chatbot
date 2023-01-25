@@ -22,7 +22,7 @@
                 "stop_sequence": null,
                 "prompt_template": "Current section chat:\n{current_section_chat}\n\nDetails:\nQuestion type: {question_type}\nIs validation correct: {is_completion_correct}\n",
                 "completion_template": "Correct Response: {correct_response}\nValidation of response: {validation_of_response}",
-                "kshot_header": "Interviewer is interviewing Applicant for a job as a Data Scientist. Interviewer knows all concepts in Data Science and always applies them correctly.\n\nInterviewer validates Applicant's responses to a question in the following format:\n\nCurrent section chat:\n$<Conversation so far between Interviewer and Applicant. This may be empty.>\n\nDetails:\nQuestion type: $<what type of question Interviewer asked>\nIs validation correct: $<1 or 0 - whether Interviewer's validation of applicant\u2019s response is correct or not>>\nCorrect response: $<correct response to Interviewer's question, if it was asked>\nValidation of response: $<whether Applicant's response is -1=Applicant has not given asnwer yet / 0=Applicant Did Not Understand question / 1=incorrect / 2=incomplete / 3=correct>\n\n\nBelow are some correct examples:\n\n",
+                "kshot_header": "Interviewer is interviewing Applicant for a job as a Data Scientist. Interviewer knows all concepts in Data Science and always applies them correctly.\n\nInterviewer validates Applicant's responses to a question in the following format:\n\nCurrent section chat:\n$<Conversation so far between Interviewer and Applicant. This may be empty.>\n\nDetails:\nQuestion type: $<what type of question Interviewer asked>\nIs validation correct: $<1 or 0 - whether Interviewer's validation of applicant\u2019s response is correct or not>>\nCorrect response: $<correct response to Interviewer's question, if it was asked>\nValidation of response: $<whether Applicant's response is -1=Applicant has not given answer yet / 0=Applicant Did Not Understand question / 1=incorrect / 2=incomplete / 3=correct>\n\n\nBelow are some correct examples:\n\n",
                 "finetuned_model_name": null
             }
         }
@@ -149,6 +149,40 @@
                 "completion_template": "Applicant: {applicant_dialogue}",
                 "kshot_header": "Interviewer is interviewing Applicant for a job as a Data Scientist.\nApplicant responds to Interviewer's questions in the following format:\n\nContext:\n$<a summary of the techniques the applicant has used for each section of the interview, the insights they have gained from exploring the data, etc>\n\nCurrent section chat:\n$<Conversation so far between Interviewer and Applicant. This may be empty.>\n\nDetails:\nApplicant skill summary: $<>\nIs response correct: $<1 or 0 - whether the response Applicant gives is correct or not>\n###\nApplicant: $<Applicant's response to Interviewer's question>\n\nBelow are some correct examples:\n\n",
                 "finetuned_model_name": null
+            }
+        }
+    },
+    "ask_why_applicant_picked_X_over_Y": {
+        "best_model_version": "21.01.23",
+        "models": {
+            "21.01.23": {
+                "prompt_template": "Current section chat:\n{current_section_chat}\n\nDetails:\nIs question correct: {is_completion_correct}\n###\n",
+                "completion_template": "Approach Chosen: {approach_chosen}\nApproaches Considered: {approaches_considered}\nInterviewer: {interviewer_dialogue}",
+                "kshot_header": "Interviewer is interviewing Applicant for a job as a Data Scientist.\nInterviewer asks Applicant a question in the following format:\n\nCurrent section chat:\n$<Conversation so far between Interviewer and Applicant. This may be empty.>\n\nDetails:\nIs question correct: $<1 or 0 - whether the question Interviewer asks is correct or not>\n###\nApproach Chosen: $<approach applicant chose to use>\nApproaches Considered: $<approach applicant considered using, but decided not to. If applicant didn't consider any other approaches, this should be 'NA'>\nInterviewer: $<Interviewer's question about why they chose their approach instead of the other. If applicant didnt consider any other approaches, come up with an acceptable approach>\n\nBelow are some correct examples:\n\n",
+                "finetuned_model_name": null,
+                "stop_sequence": "$$$",
+                "model_name": "ask_why_applicant_picked_X_over_Y",
+                "model_version": "21.01.23"
+            }
+        }
+    },
+    "validate_why_applicant_picked_X_over_Y": {
+        "best_model_version": "24.01.23",
+        "models": {
+            "24.01.23": {
+                "prompt_template": "Context:\n{context}\n\nCurrent section chat:\n{current_section_chat}\n\nDetails:\nIs validation correct: {validation_of_response}\n###\n",
+                "completion_template": "Validation of response: {validation_of_response}\nApplicant justifications:\n{applicant_justifications}\nNumber of correct, incorrect, irrelevant subpoints: {num_correct_subpoints}, {num_incorrect_subpoints}, {num_irrelevant_subpoints}\n",
+                "nested_completion_templates": {
+                    "applicant_justifications": {
+                        "template": "<{subpoint}><{validation_of_subpoint}><{reason_for_validation}>",
+                        "delimiter": "Subpoint: "
+                    }
+                },
+                "kshot_header": "Interviewer is interviewing Applicant for a job as a Data Scientist.\nInterviewer validates Applicant's answer to a question in the following format:\n\nContext:\n$<a summary of the techniques the applicant has used for each section of the interview, the insights gained from any analysis, the objective of the case study, and any constraints/requirements to applicant's solution>\n\nCurrent section chat:\n$<Conversation so far between Interviewer and Applicant. This may be empty.>\n\nDetails:\nIs validation correct: $<1 or 0 - whether Interviewer's validation of applicant's response is correct or not>\n###\nValidation of response: $<whether Applicant's response is -1=Applicant has not given answer yet / 0=Applicant Did Not Understand question / 1=applicant has given an answer>\nApplicant justifications:\n$<The subpoints applicant makes in their response to interviewer's question, in the following format (one line for each subpoint): \"Subpoint: <subpoint> <interviewer's assessment of whether that subpoint is correct (1), incorrect (-1), or irrelevant (0)> <Reason for why the subpoint is incorrect, if it is incorrect. If it is valid/irrelevant, output \"NA\">\". If applicant makes no subpoints, output \"NA\">\nNumber of correct, incorrect, irrelevant subpoints: $<the number of correct subpoints applicant made>, $<the number of incorrect subpoints applicant made>, $<the number of irrelevant subpoints applicant made>\n\n\nBelow are some correct examples:\n\n",
+                "finetuned_model_name": null,
+                "stop_sequence": "$$$",
+                "model_name": "validate_why_applicant_picked_X_over_Y",
+                "model_version": "24.01.23"
             }
         }
     }

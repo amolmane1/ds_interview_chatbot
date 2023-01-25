@@ -291,3 +291,17 @@ def prepare_kshot_prompt_using_levenshtein_distance(model_name, model_metadata, 
 # def identify_what_applicant_has_done_in_ipynb():
 #     applicant_approaches_json = json.dumps(applicant_approaches)
 #     return applicant_approaches_json
+
+
+def parse_completion_args(completion, model_metadata):
+    # values = []
+    # for value in res:
+    #     try:
+    #         values.append(parse(template, value).named)
+    #     except:
+    #         pass
+    pass
+
+
+def prepare_completion_using_tempalte_and_args(model_metadata, ):
+    pass
