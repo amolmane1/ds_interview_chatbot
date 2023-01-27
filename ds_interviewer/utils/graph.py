@@ -96,6 +96,13 @@ def create_interview_flowchart():
                            # function=get_response_from_python_input,
                            function=get_response_from_applicant_persona
                           )
+
+    section_graph.add_node("validate_why_applicant_picked_X_over_Y", function=validate_why_applicant_picked_X_over_Y)
+    section_graph.add_node("ask_why_applicant_picked_X_over_Y", function=ask_why_applicant_picked_X_over_Y)
+    section_graph.add_node("get_applicant_response-4",
+                           # function=get_response_from_python_input,
+                           function=get_response_from_applicant_persona
+                          )
     
     section_graph.add_node("empty_node", function=empty_node)
     
@@ -117,9 +124,13 @@ def create_interview_flowchart():
     section_graph.add_edge("route_answer_to_what_other_options_applicant_considered", "ask_what_other_options_applicant_considered", passthrough_values=[-1])
     section_graph.add_edge("ask_what_other_options_applicant_considered", "get_applicant_response-3")
     section_graph.add_edge("get_applicant_response-3", "route_answer_to_what_other_options_applicant_considered")
-    section_graph.add_edge("route_answer_to_what_other_options_applicant_considered", "empty_node", passthrough_values=[0,1])
+    section_graph.add_edge("route_answer_to_what_other_options_applicant_considered", "validate_why_applicant_picked_X_over_Y", passthrough_values=[0,1])
 
-    
+    section_graph.add_edge("validate_why_applicant_picked_X_over_Y", "ask_why_applicant_picked_X_over_Y", passthrough_values=[-1])
+    section_graph.add_edge("ask_why_applicant_picked_X_over_Y", "get_applicant_response-4")
+    section_graph.add_edge("get_applicant_response-4", "validate_why_applicant_picked_X_over_Y")
+    section_graph.add_edge("validate_why_applicant_picked_X_over_Y", "empty_node", passthrough_values=[0,1])
+
     ## algo selection
     interview_graph.nodes["algorithm selection"]['graph'] = deepcopy(section_graph)
 

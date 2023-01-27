@@ -6,12 +6,8 @@ from copy import deepcopy
 from IPython.display import clear_output
 import datetime
 
-from utils.utils import get_label_for_correct_or_incorrect_completion, path_to_finetuning_data_folder
+from utils.utils import get_label_for_correct_or_incorrect_completion, path_to_finetuning_data_folder, parse_completion_args
 from utils.models_metadata import get_model_metadata
-
-# test_array = []
-# this should be a file saved in data folder
-finetuning_validation_queue = []
 
 
 # def add_observation_to_formatted_finetuning_dataset(model_name, prompt, completion):
@@ -165,24 +161,23 @@ def validate_observation_for_finetuning(observation_details):
             # create positive observation, send to master data set
             positive_observation_details_for_finetuning = deepcopy(observation_details)
             print("********* Correct Completion *********")
+            positive_observation_raw_completion_args = {}
             for key in positive_observation_details_for_finetuning['completion_args'].keys():
-                correct_value = input("{}: ".format(key))
-                positive_observation_details_for_finetuning['completion_args'][key] = correct_value
-            positive_observation_details_for_finetuning['completion'] = positive_observation_details_for_finetuning['completion_template'] \
-                .format(**positive_observation_details_for_finetuning['completion_args'])
+                print("{}: ".format(key))
+                positive_observation_raw_completion_args[key] = "\n".join(iter(input, ""))
+            positive_observation_details_for_finetuning['completion'] = model_metadata['completion_template'].format(**positive_observation_raw_completion_args)
+            positive_observation_details_for_finetuning['completion_args'] = parse_completion_args(positive_observation_details_for_finetuning['completion'], model_metadata)
             correct_completion_args = positive_observation_details_for_finetuning['completion_args']
             add_observation_to_finetuning_datasets(positive_observation_details_for_finetuning)
         return dict(validated=True, correct_completion_args=correct_completion_args)
     else:
         return dict(validated=False, correct_completion_args=None)
 
-    
+
 def submit_observation_for_finetuning_validation(observation_details, validate_async=True):
     """
     observation_details: dict containing the following keys: model_name, model_version, prompt_template, completion_template, prompt_args, completion_args, prompt, completion 
     """
-    
-    
     folder_path = path_to_finetuning_data_folder
     file_name = "finetuning_validation_queue.json"
     file_path = Path("{0}/{1}".format(folder_path, file_name))

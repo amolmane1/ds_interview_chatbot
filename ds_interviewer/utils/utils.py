@@ -7,6 +7,8 @@ import logging
 from IPython.display import clear_output
 import inspect
 from jellyfish import levenshtein_distance
+from parse import parse
+from copy import deepcopy
 
 from utils.models_metadata import get_model_metadata
 
@@ -117,11 +119,11 @@ def get_feedback(starting_tag):
     return tag, label, reason, insights
 
 
-def ask_gpt_get_feedback_and_log(prompt, topic='misc', args=default_arguments_for_openai_generation, starting_tag=''):
-    gpt_response = ask_gpt(prompt, args)
-    tag, label, reason, insights = get_feedback(starting_tag)
-    log_completion_and_feedback(args, prompt, gpt_response, topic, tag=tag, label=label, reason=reason, insights=insights)
-    return gpt_response
+# def ask_gpt_get_feedback_and_log(prompt, topic='misc', args=default_arguments_for_openai_generation, starting_tag=''):
+#     gpt_response = ask_gpt(prompt, args)
+#     tag, label, reason, insights = get_feedback(starting_tag)
+#     log_completion_and_feedback(args, prompt, gpt_response, topic, tag=tag, label=label, reason=reason, insights=insights)
+#     return gpt_response
 
 
 def get_label_for_correct_or_incorrect_completion():
@@ -283,7 +285,7 @@ def prepare_kshot_prompt_using_levenshtein_distance(model_name, model_metadata, 
     
     # add the prompt that we want openai to complete to kshot-prompt
     kshot_prompt += observation_prompt
-    assert kshot_prompt_length < max_length
+    assert kshot_prompt_length <= max_length
     
     return kshot_prompt
 
@@ -294,14 +296,44 @@ def prepare_kshot_prompt_using_levenshtein_distance(model_name, model_metadata, 
 
 
 def parse_completion_args(completion, model_metadata):
-    # values = []
-    # for value in res:
-    #     try:
-    #         values.append(parse(template, value).named)
-    #     except:
-    #         pass
-    pass
+    raw_completion_args = parse(model_metadata['completion_template'], 
+                        completion).named
+    parsed_completion_args = deepcopy(raw_completion_args)
+
+    if "nested_completion_templates" in model_metadata:
+        for key in model_metadata['nested_completion_templates']:
+            raw_value = raw_completion_args[key]
+            values = []
+            split_data = raw_value.split(model_metadata['nested_completion_templates'][key]['delimiter'])
+            # print(split_data)
+            for line in split_data:
+                try:
+                    # values.append(parse(model_metadata['nested_completion_templates'][key]['template'], line).named)
+                    values.append(parse(model_metadata['nested_completion_templates'][key]['template'], line.strip()).named)
+                except:
+                    pass
+            # if len(values) == 0:
+            #     values = ["NA\n"]
+            parsed_completion_args[key] = values
+    return parsed_completion_args
 
 
-def prepare_completion_using_tempalte_and_args(model_metadata, ):
-    pass
+def prepare_completion_using_nested_args(completion_args, model_metadata):
+    formatted_completion_args = deepcopy(completion_args)
+
+    if "nested_completion_templates" in model_metadata:
+        for key in model_metadata['nested_completion_templates']:
+            formatted_completion_arg = ""
+            for raw_line in completion_args[key]:
+                # formatted_value = model_metadata['nested_completion_templates'][key]['delimiter'] + model_metadata['nested_completion_templates'][key]['template'].format(**raw_line)
+                formatted_value = model_metadata['nested_completion_templates'][key]['delimiter'] + model_metadata['nested_completion_templates'][key]['template'].format(**raw_line) + "\n"
+                formatted_completion_arg += formatted_value
+            if formatted_completion_arg == "":
+                # formatted_completion_arg = "NA\n"
+                formatted_completion_arg = "NA"
+            # formatted_completion_args[key] = formatted_completion_arg
+            formatted_completion_args[key] = formatted_completion_arg.strip()
+    
+    # then format the whole completion template
+    completion = model_metadata['completion_template'].format(**formatted_completion_args)
+    return completion

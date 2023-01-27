@@ -170,8 +170,8 @@
         "best_model_version": "24.01.23",
         "models": {
             "24.01.23": {
-                "prompt_template": "Context:\n{context}\n\nCurrent section chat:\n{current_section_chat}\n\nDetails:\nIs validation correct: {validation_of_response}\n###\n",
-                "completion_template": "Validation of response: {validation_of_response}\nApplicant justifications:\n{applicant_justifications}\nNumber of correct, incorrect, irrelevant subpoints: {num_correct_subpoints}, {num_incorrect_subpoints}, {num_irrelevant_subpoints}\n",
+                "prompt_template": "Context:\n{context}\n\nCurrent section chat:\n{current_section_chat}\n\nDetails:\nIs validation correct: {is_completion_correct}\n###\n",
+                "completion_template": "Validation of response: {validation_of_response}\nApplicant justifications:\n{applicant_justifications}\nNumber of correct, incorrect, irrelevant subpoints: {num_correct_subpoints}, {num_incorrect_subpoints}, {num_irrelevant_subpoints}",
                 "nested_completion_templates": {
                     "applicant_justifications": {
                         "template": "<{subpoint}><{validation_of_subpoint}><{reason_for_validation}>",
