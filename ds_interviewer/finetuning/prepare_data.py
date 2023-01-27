@@ -6,7 +6,7 @@ from copy import deepcopy
 from IPython.display import clear_output
 import datetime
 
-from utils.utils import get_label_for_correct_or_incorrect_completion, path_to_finetuning_data_folder, parse_completion_args
+from utils.utils import get_label_for_correct_or_incorrect_completion, path_to_finetuning_data_folder, parse_completion_args, format_prompt_and_completion_templates_with_args
 from utils.models_metadata import get_model_metadata
 
 
@@ -27,13 +27,6 @@ from utils.models_metadata import get_model_metadata
 #     file.to_csv(filepath, index=False)
 
 
-def format_prompt_and_completion_templates_with_args(row, prompt_template, completion_template):
-    args = row.to_dict()
-    prompt = prompt_template.format(**args)
-    completion = completion_template.format(**args)
-    return {"prompt": prompt, "completion": completion}
-
-
 def prepare_formatted_finetuning_dataset(model_name, model_version, exclusion_indices=[], start_index=0, end_index=-1):
     # TODO: figure out which rows have values for the prompt args that are required by this model version. 
     # format only those. allow to exclude some columns (like chat history for ask_how_it_works)
@@ -47,11 +40,10 @@ def prepare_formatted_finetuning_dataset(model_name, model_version, exclusion_in
     raw_finetuning_dataset_subset = raw_finetuning_dataset.iloc[start_index:end_index+1].drop(index=exclusion_indices)
 
     model_metadata, model_version = get_model_metadata(model_name, model_version)
-    formatted_finetuning_dataset = pd.DataFrame(raw_finetuning_dataset.apply(format_prompt_and_completion_templates_with_args, 
+    formatted_finetuning_dataset = pd.DataFrame(raw_finetuning_dataset_subset.apply(format_prompt_and_completion_templates_with_args, 
                                                                 axis=1, 
                                                                 result_type='expand', 
-                                                                args=(model_metadata['prompt_template'], 
-                                                                      model_metadata['completion_template'])))
+                                                                args=model_metadata))
     
     formatted_folder_path = "{0}/version_{1}".format(raw_folder_path, model_version)
     Path(formatted_folder_path).mkdir(parents=True, exist_ok=True)
@@ -78,11 +70,10 @@ def add_observation_to_raw_finetuning_dataset(observation_details):
         raw_finetuning_dataset = pd.DataFrame(columns=[])
     # append row to that file
     upload_timestamp = datetime.datetime.now()
-    row = pd.DataFrame({'meta.timestamp': upload_timestamp, 
-                        # 'meta.compatible_model_versions': [model_version],
-                       **observation_details['prompt_args'], 
-                       **observation_details['completion_args']}, 
-                       index=[0])
+    row = pd.DataFrame(pd.Series({'meta.timestamp': upload_timestamp, 
+                    **observation_details['prompt_args'], 
+                    **observation_details['completion_args']})).T
+    row.to_csv("row.csv", index=False)
     raw_finetuning_dataset = pd.concat((raw_finetuning_dataset, row), ignore_index=True)
     raw_finetuning_dataset.to_csv(file_path, na_rep='NA', index=False)
     observation_index = len(raw_finetuning_dataset) - 1
