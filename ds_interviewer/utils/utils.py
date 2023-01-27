@@ -7,6 +7,9 @@ import logging
 from IPython.display import clear_output
 import inspect
 from jellyfish import levenshtein_distance
+from parse import parse
+from copy import deepcopy
+import ast
 
 from utils.models_metadata import get_model_metadata
 
@@ -117,11 +120,11 @@ def get_feedback(starting_tag):
     return tag, label, reason, insights
 
 
-def ask_gpt_get_feedback_and_log(prompt, topic='misc', args=default_arguments_for_openai_generation, starting_tag=''):
-    gpt_response = ask_gpt(prompt, args)
-    tag, label, reason, insights = get_feedback(starting_tag)
-    log_completion_and_feedback(args, prompt, gpt_response, topic, tag=tag, label=label, reason=reason, insights=insights)
-    return gpt_response
+# def ask_gpt_get_feedback_and_log(prompt, topic='misc', args=default_arguments_for_openai_generation, starting_tag=''):
+#     gpt_response = ask_gpt(prompt, args)
+#     tag, label, reason, insights = get_feedback(starting_tag)
+#     log_completion_and_feedback(args, prompt, gpt_response, topic, tag=tag, label=label, reason=reason, insights=insights)
+#     return gpt_response
 
 
 def get_label_for_correct_or_incorrect_completion():
@@ -177,11 +180,7 @@ tags_map = {
 'c': 'complete',
 'vj': 'validate jim',
 'va': 'validate applicant',
-}
-
-
-# def get_subject_for_node_function(carryover_data, ):
-    
+}    
 
 
 def prepare_chat_history(chat_history=[], max_length=800, empty_value='NA'):
@@ -217,12 +216,11 @@ def calculate_levenshtein_distance_for_intersecting_args(row, prompt_args, promp
     return levenshtein_distance(prompt_args_json, relevant_row_args_json)
 
 
-def format_observation_template_with_args(row, prompt_template, completion_template):
-    args = row.to_dict()
-    prompt = prompt_template.format(**args)
-    completion = completion_template.format(**args)
-    observation = prompt + completion
-    return observation
+def format_prompt_and_completion_templates_with_args(row, model_metadata):
+    args = row.to_dict() 
+    prompt = model_metadata['prompt_template'].format(**args)
+    completion = prepare_completion_using_nested_args(args, model_metadata)
+    return {"prompt": prompt, "completion": completion}
 
 
 def prepare_kshot_prompt_using_levenshtein_distance(model_name, model_metadata, prompt_args, observation_prompt=None, max_tokens=1800):
@@ -268,9 +266,9 @@ def prepare_kshot_prompt_using_levenshtein_distance(model_name, model_metadata, 
             row = raw_finetuning_dataset.loc[id_of_raw_finetuning_dataset]
 
             # prepare observation
-            historical_observation = format_observation_template_with_args(row, 
-                                                                           model_metadata['prompt_template'], 
-                                                                           model_metadata['completion_template'])
+            formatted_prompt_and_completion = format_prompt_and_completion_templates_with_args(row, 
+                                                                        model_metadata)
+            historical_observation = formatted_prompt_and_completion['prompt'] + formatted_prompt_and_completion['completion']
             formatted_historical_observation = historical_observation + stop_sequence + "\n\n\n"
 
             # If that obs plus kshot prompt length > max length, don't add it to the kshot prompt. break
@@ -283,7 +281,7 @@ def prepare_kshot_prompt_using_levenshtein_distance(model_name, model_metadata, 
     
     # add the prompt that we want openai to complete to kshot-prompt
     kshot_prompt += observation_prompt
-    assert kshot_prompt_length < max_length
+    assert kshot_prompt_length <= max_length
     
     return kshot_prompt
 
@@ -291,3 +289,41 @@ def prepare_kshot_prompt_using_levenshtein_distance(model_name, model_metadata, 
 # def identify_what_applicant_has_done_in_ipynb():
 #     applicant_approaches_json = json.dumps(applicant_approaches)
 #     return applicant_approaches_json
+
+
+def parse_completion_args(completion, model_metadata):
+    raw_completion_args = parse(model_metadata['completion_template'], 
+                        completion).named
+    parsed_completion_args = deepcopy(raw_completion_args)
+
+    if "nested_completion_templates" in model_metadata:
+        for key in model_metadata['nested_completion_templates']:
+            raw_value = raw_completion_args[key]
+            values = []
+            split_data = raw_value.split(model_metadata['nested_completion_templates'][key]['delimiter'])
+            for line in split_data:
+                try:
+                    values.append(parse(model_metadata['nested_completion_templates'][key]['template'], line.strip()).named)
+                except:
+                    pass
+            parsed_completion_args[key] = values
+    return parsed_completion_args
+
+
+def prepare_completion_using_nested_args(completion_args, model_metadata):
+    formatted_completion_args = deepcopy(completion_args)
+
+    if "nested_completion_templates" in model_metadata:
+        for key in model_metadata['nested_completion_templates']:
+            formatted_completion_arg = ""
+            completion_arg_value = ast.literal_eval(completion_args[key])
+            for raw_line in completion_arg_value:
+                formatted_value = model_metadata['nested_completion_templates'][key]['delimiter'] + model_metadata['nested_completion_templates'][key]['template'].format(**raw_line) + "\n"
+                formatted_completion_arg += formatted_value
+            if formatted_completion_arg == "":
+                formatted_completion_arg = "NA"
+            formatted_completion_args[key] = formatted_completion_arg.strip()
+    
+    # then format the whole completion template
+    completion = model_metadata['completion_template'].format(**formatted_completion_args)
+    return completion
