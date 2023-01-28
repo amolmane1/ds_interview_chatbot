@@ -6,7 +6,8 @@ from copy import deepcopy
 from IPython.display import clear_output
 import datetime
 
-from utils.utils import get_label_for_correct_or_incorrect_completion, path_to_finetuning_data_folder, parse_completion_args, format_prompt_and_completion_templates_with_args
+from utils.utils import get_multiline_input_from_user, ask_user_if_they_want_to_validate_now, get_label_for_correct_or_incorrect_completion, \
+    path_to_finetuning_data_folder, parse_completion_args, format_prompt_and_completion_templates_with_args
 from utils.models_metadata import get_model_metadata
 
 
@@ -73,7 +74,7 @@ def add_observation_to_raw_finetuning_dataset(observation_details):
     row = pd.DataFrame(pd.Series({'meta.timestamp': upload_timestamp, 
                     **observation_details['prompt_args'], 
                     **observation_details['completion_args']})).T
-    row.to_csv("row.csv", index=False)
+    # row.to_csv("row.csv", index=False)
     raw_finetuning_dataset = pd.concat((raw_finetuning_dataset, row), ignore_index=True)
     raw_finetuning_dataset.to_csv(file_path, na_rep='NA', index=False)
     observation_index = len(raw_finetuning_dataset) - 1
@@ -133,12 +134,12 @@ def validate_observation_for_finetuning(observation_details):
     print(print_template.format(observation_details['model_name'], 
                                 observation_details['prompt'], 
                                 observation_details['completion']))
-    validate_now = int(input("Do you want to validate this observation now? (1/0): "))
-    
+    validate_now = ask_user_if_they_want_to_validate_now()
+
     if validate_now:
         label = get_label_for_correct_or_incorrect_completion()
         
-        if label == 1:
+        if label:
             correct_completion_args = deepcopy(observation_details['completion_args'])
             add_observation_to_finetuning_datasets(observation_details)
         else:
@@ -154,8 +155,7 @@ def validate_observation_for_finetuning(observation_details):
             print("********* Correct Completion *********")
             positive_observation_raw_completion_args = {}
             for key in positive_observation_details_for_finetuning['completion_args'].keys():
-                print("{}: ".format(key))
-                positive_observation_raw_completion_args[key] = "\n".join(iter(input, ""))
+                positive_observation_raw_completion_args[key] = get_multiline_input_from_user(key)
             positive_observation_details_for_finetuning['completion'] = model_metadata['completion_template'].format(**positive_observation_raw_completion_args)
             positive_observation_details_for_finetuning['completion_args'] = parse_completion_args(positive_observation_details_for_finetuning['completion'], model_metadata)
             correct_completion_args = positive_observation_details_for_finetuning['completion_args']
