@@ -47,15 +47,24 @@ def create_interview_flowchart():
     interview_graph = nx.MultiDiGraph()
     
     interview_graph.add_node("introduction")
-    interview_graph.add_node("algorithm selection")
-    interview_graph.add_node("dealing with categorical values")
-    interview_graph.add_node("dealing with numerical values")
+    # interview_graph.add_node("algorithm selection")
+    # interview_graph.add_node("dealing with categorical values")
+    # interview_graph.add_node("dealing with numerical values")
+    # interview_graph.add_node("model presentation layer")
+    interview_graph.add_node("missing values")
+
     interview_graph.add_node("conclusion")
     
-    interview_graph.add_edge("introduction", "algorithm selection")    
-    interview_graph.add_edge("algorithm selection", "dealing with categorical values")
-    interview_graph.add_edge("dealing with categorical values", "dealing with numerical values")
-    interview_graph.add_edge("dealing with numerical values", "conclusion")
+    # interview_graph.add_edge("introduction", "algorithm selection")    
+    # interview_graph.add_edge("algorithm selection", "dealing with categorical values")
+    # interview_graph.add_edge("dealing with categorical values", "dealing with numerical values")
+    # interview_graph.add_edge("dealing with numerical values", "conclusion")
+
+    # interview_graph.add_edge("introduction", "model presentation layer")
+    # interview_graph.add_edge("model presentation layer", "conclusion")
+
+    interview_graph.add_edge("introduction", "missing values")
+    interview_graph.add_edge("missing values", "conclusion")
 
     
     ## introduction
@@ -104,6 +113,13 @@ def create_interview_flowchart():
                            function=get_response_from_applicant_persona
                           )
     
+    section_graph.add_node("validate_answer_devils_advocate", function=validate_answer_devils_advocate)
+    section_graph.add_node("ask_devils_advocate_question", function=ask_devils_advocate_question)
+    section_graph.add_node("get_applicant_response-5",
+                           # function=get_response_from_python_input,
+                           function=get_response_from_applicant_persona
+                          )
+
     section_graph.add_node("empty_node", function=empty_node)
     
 
@@ -129,16 +145,28 @@ def create_interview_flowchart():
     section_graph.add_edge("validate_why_applicant_picked_X_over_Y", "ask_why_applicant_picked_X_over_Y", passthrough_values=[-1])
     section_graph.add_edge("ask_why_applicant_picked_X_over_Y", "get_applicant_response-4")
     section_graph.add_edge("get_applicant_response-4", "validate_why_applicant_picked_X_over_Y")
-    section_graph.add_edge("validate_why_applicant_picked_X_over_Y", "empty_node", passthrough_values=[0,1])
+    section_graph.add_edge("validate_why_applicant_picked_X_over_Y", "ask_devils_advocate_question", passthrough_values=[0,1])
 
-    ## algo selection
-    interview_graph.nodes["algorithm selection"]['graph'] = deepcopy(section_graph)
+    section_graph.add_edge("ask_devils_advocate_question", "get_applicant_response-5")
+    section_graph.add_edge("get_applicant_response-5", "validate_answer_devils_advocate")
+    section_graph.add_edge("validate_answer_devils_advocate", "empty_node", passthrough_values=[0,1])
 
-    ## categorical
-    interview_graph.nodes["dealing with categorical values"]['graph'] = deepcopy(section_graph)
+    # ## algo selection
+    # interview_graph.nodes["algorithm selection"]['graph'] = deepcopy(section_graph)
+
+    # ## categorical
+    # interview_graph.nodes["dealing with categorical values"]['graph'] = deepcopy(section_graph)
     
-    ## numerical
-    interview_graph.nodes["dealing with numerical values"]['graph'] = deepcopy(section_graph)
+    # ## numerical
+    # interview_graph.nodes["dealing with numerical values"]['graph'] = deepcopy(section_graph)
+
+    # MPL
+    # interview_graph.nodes["model presentation layer"]['graph'] = deepcopy(section_graph)
+
+    # missing values
+    interview_graph.nodes["missing values"]['graph'] = deepcopy(section_graph)
+    
+    
 
     ## conclusion
     section_graph = nx.MultiDiGraph()

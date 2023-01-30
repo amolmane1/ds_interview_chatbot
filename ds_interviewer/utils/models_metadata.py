@@ -10,7 +10,7 @@ new_model_template = {
 new_model_version_metadata_template = {
     'prompt_template': None,
     'completion_template': None,
-    'nested_completion_templates': None,
+    'nested_completion_templates': {},
     'kshot_header': None,
     'finetuned_model_name': None,
     'stop_sequence': None

@@ -191,7 +191,7 @@
         "models": {
             "27.01.23": {
                 "prompt_template": "What applicant did for each section:\n{what_applicant_did_for_each_section}\n\nObjectives/Constraints:\n{objectives_and_constraints}\n\nInsights:\n{insights}\n\nCurrent section chat:\n{current_section_chat}\n\nDetails:\nIs validation correct: {is_completion_correct}\n###\n",
-                "completion_template": "Validation of response: {validation_of_response}\n\nApplicant justifications:\n{applicant_justifications}\n\nNumber of correct, incorrect, irrelevant subpoints: {num_correct_subpoints}, {num_incorrect_subpoints}, {num_irrelevant_subpoints}\n",
+                "completion_template": "Validation of response: {validation_of_response}\n\nApplicant justifications:\n{applicant_justifications}\n\nNumber of correct, incorrect, irrelevant subpoints: {num_correct_subpoints}, {num_incorrect_subpoints}, {num_irrelevant_subpoints}",
                 "nested_completion_templates": {
                     "applicant_justifications": {
                         "template": "<{subpoint}><{validation_of_subpoint}><{reason_for_validation}>",
@@ -211,8 +211,8 @@
         "models": {
             "27.01.23": {
                 "prompt_template": "What applicant did for each section:\n{what_applicant_did_for_each_section}\n\nObjectives/Constraints:\n{objectives_and_constraints}\n\nInsights:\n{insights}\n\nCurrent section chat:\n{current_section_chat}\n\nDetails:\nIs question correct: {is_completion_correct}\n###\n",
-                "completion_template": "Subject 1: {subject_1}\nSubject 2: {subject_2}\nDisadvantage of using Subject 1: {disadvantage_of_using_subject_1}\nInterviewer: {interviewer_dialogue}\n",
-                "nested_completion_templates": null,
+                "completion_template": "Subject 1: {subject_1}\nSubject 2: {subject_2}\nDisadvantage of using Subject 1: {disadvantage_of_using_subject_1}\nInterviewer: {interviewer_dialogue}",
+                "nested_completion_templates": {},
                 "kshot_header": "Interviewer is interviewing Applicant for a job as a Data Scientist.\nInterviewer asks Applicant a question similar to \"But the issue with your approach is <>. Do you still think it is the optimal choice?\" in the following format:\n\nWhat applicant did for each section:\n$<a summary of the techniques the applicant has used for each section of the interview>\n\nObjectives/Constraints:\n$<the objective of the case study, and any constraints/requirements to applicant's solution>\n\nInsights:\n$<any insights about the problem>\n\nCurrent section chat:\n$<Conversation so far between Interviewer and Applicant>\n\nDetails:\nIs validation correct: $<1 or 0 - whether Interviewer's validation of applicant's response is correct or not>\n###\nSubject 1: $<approach applicant chose to use>\nSubject 2: $<approach applicant considered using, but decided not to. If applicant didn't consider any other approaches, this should be 'NA'>\nDisadvantage of using Subject 1: $<a disadvantage/negative implication of using the applicant's chosen approach, given the objectives/constrains of the problem and any insights we have about the data. This must be something that has not been mentioned already in the conversation.>\nInterviewer: $<Interviewer's dialogue on the distadvantage of using the applicant's chosen approach, and whether the applicant still thinks their approach is optimal>\n\nBelow are some correct examples:\n\n",
                 "finetuned_model_name": null,
                 "stop_sequence": "$$$",
