@@ -220,5 +220,20 @@
                 "model_version": "27.01.23"
             }
         }
+    },
+    "ask_what_applicant_would_choose_given_requirement": {
+        "best_model_version": "29.01.23",
+        "models": {
+            "29.01.23": {
+                "prompt_template": "Task/Objectives/Constraints:\n{objectives_and_constraints}\n\nWhat applicant did for each section:\n{what_applicant_did_for_each_section}\n\nInsights:\n{insights}\n\nCurrent section chat:\n{current_section_chat}\n\nSubject 1: {subject_1}\nSubject 2: {subject_2}\nIs question correct: {is_completion_correct}\n###\n",
+                "completion_template": "Subject 1: {subject_1}\nSubject 2: {subject_2}\nScenario where Subject 1 is optimal: {scenario_where_subject_1_is_optimal}\nScenario where Subject 2 is optimal: {scenario_where_subject_2_is_optimal}\nInterviewer: {interviewer_dialogue}",
+                "nested_completion_templates": {},
+                "kshot_header": "Interviewer is interviewing Applicant for a job as a Data Scientist.\nInterviewer asks Applicant a question similar to \"Which approach would you choose if you had <> constraint/requirement/context, and why?\" in the following format:\n\nTask/Objectives/Constraints:\n$<the problem statement, the objective of the case study, and any constraints/requirements to applicant's solution>\n\nWhat applicant did for each section:\n$<a summary of the techniques the applicant has used for each section of the interview>\n\nInsights:\n$<any insights about the data/domain/client/user>\n\nCurrent section chat:\n$<Conversation so far between Interviewer and Applicant>\n\nSubject 1: $<one of the approaches applicant can choose from, given a scenario. Can be \"NA\".>\nSubject 2: $<the other approach applicant can choose from, given a scenario. Can be \"NA\".>\nIs question correct: $<1 or 0 - whether Interviewer asks the right question (1) or not (0)>\n###\nSubject 1: $<confirm one of the approaches applicant can choose from, given a scenario. If this is \"NA\" in the prompt, infer it from the chat history (the approach the applicant chose to use). But if it has a value in the prompt, use that value instead of anything mentioned in the chat history.>\nSubject 2: $<confirm the other approach applicant can choose from, given a scenario. If this is \"NA\" in the prompt, infer it from the chat history (the approach the applicant considerered using, but ultimately didn't). But if it has a value in the prompt, use that value instead of anything mentioned in the chat history.>\nScenario where Subject 1 is optimal: $<a Scenario where Subject 1 is optimal. This must be something that has not been mentioned already in the conversation. Scenario must be plausible given the problem statement and domain.>\nScenario where Subject 2 is optimal: $<a Scenario where Subject 2 is optimal. This must be something that has not been mentioned already in the conversation. Scenario must be plausible given the problem statement and domain.>\nInterviewer: $<Interviewer's dialogue sharing a scenario, and asking which approach the applicant would use, and why>\n\nBelow are some correct examples:\n\n",
+                "finetuned_model_name": null,
+                "stop_sequence": "$$$",
+                "model_name": "ask_what_applicant_would_choose_given_requirement",
+                "model_version": "29.01.23"
+            }
+        }
     }
 }
