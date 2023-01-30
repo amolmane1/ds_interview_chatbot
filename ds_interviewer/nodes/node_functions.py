@@ -3,6 +3,7 @@ from utils.utils import default_arguments_for_openai_generation, default_argumen
 from utils.models_metadata import get_model_metadata
 from finetuning.prepare_data import submit_observation_for_finetuning_validation
 from parse import parse
+from nodes.helpers import run_node
 
 
 def share_introduction_boilerplate(**kwargs):
@@ -63,40 +64,53 @@ def share_conclusion_boilerplate(**kwargs):
                 new_chat_lines=new_chat_lines) 
 
 
-def confirm_what_applicant_did(current_section_name, context, carryover_data, validate_async=True, chat_history_by_section=[[]], **kwargs):
+def confirm_what_applicant_did(current_section_name, carryover_data, validate_async=True, chat_history_by_section=[[]], **kwargs):
     model_name = "confirm_what_applicant_did"
-    model_metadata, model_version = get_model_metadata(model_name, kwargs["model_version"] if "model_version" in kwargs.keys() else None)
     prompt_args = dict(
-        context=context,
-        current_section_chat=prepare_chat_history(chat_history_by_section[-1]),
-                      section=current_section_name,
-                      is_completion_correct=1)
-    observation_prompt = model_metadata['prompt_template'].format(**prompt_args)
+                    context=carryover_data['what_interviewer_thinks_applicant_has_done_in_ipynb'],
+                    current_section_chat=prepare_chat_history(chat_history_by_section[-1]),
+                    section=current_section_name,
+                    is_completion_correct=1)
+    return run_node(node_type="ask", 
+                    model_name=model_name, 
+                    prompt_args=prompt_args, 
+                    other_args=kwargs, 
+                    validate_async=validate_async)
+
+# def confirm_what_applicant_did(current_section_name, context, carryover_data, validate_async=True, chat_history_by_section=[[]], **kwargs):
+#     model_name = "confirm_what_applicant_did"
+#     model_metadata, model_version = get_model_metadata(model_name, kwargs["model_version"] if "model_version" in kwargs.keys() else None)
+#     prompt_args = dict(
+#                     context=context,
+#                     current_section_chat=prepare_chat_history(chat_history_by_section[-1]),
+#                       section=current_section_name,
+#                       is_completion_correct=1)
+#     observation_prompt = model_metadata['prompt_template'].format(**prompt_args)
     
-    kshot_prompt = prepare_kshot_prompt_using_levenshtein_distance(model_name=model_name, 
-                                                                   model_metadata=model_metadata, 
-                                                                   prompt_args=prompt_args, 
-                                                                   observation_prompt=observation_prompt)
-    completion = create_openai_completion(kshot_prompt, model_metadata=model_metadata, args=default_arguments_for_openai_generation)
+#     kshot_prompt = prepare_kshot_prompt_using_levenshtein_distance(model_name=model_name, 
+#                                                                    model_metadata=model_metadata, 
+#                                                                    prompt_args=prompt_args, 
+#                                                                    observation_prompt=observation_prompt)
+#     completion = create_openai_completion(kshot_prompt, model_metadata=model_metadata, args=default_arguments_for_openai_generation)
 
-    completion_args = parse(model_metadata['completion_template'], 
-                            completion).named
-    observation_details = dict(model_name=model_name, 
-                               model_version=model_version,
-                               prompt_template=model_metadata['prompt_template'], 
-                               completion_template=model_metadata['completion_template'], 
-                               prompt_args=prompt_args, 
-                               completion_args=completion_args,
-                               prompt = observation_prompt,
-                               completion=completion)
-    completion_args_to_use_for_interview = submit_observation_for_finetuning_validation(observation_details, 
-                                                                                        validate_async=validate_async)
+#     completion_args = parse(model_metadata['completion_template'], 
+#                             completion).named
+#     observation_details = dict(model_name=model_name, 
+#                                model_version=model_version,
+#                                prompt_template=model_metadata['prompt_template'], 
+#                                completion_template=model_metadata['completion_template'], 
+#                                prompt_args=prompt_args, 
+#                                completion_args=completion_args,
+#                                prompt = observation_prompt,
+#                                completion=completion)
+#     completion_args_to_use_for_interview = submit_observation_for_finetuning_validation(observation_details, 
+#                                                                                         validate_async=validate_async)
 
-    new_chat_lines = []
-    new_chat_lines.append("Interviewer: " + completion_args_to_use_for_interview['interviewer_dialogue'])
-    # new_chat_lines.append(get_user_input())
-    return dict(routing_value=None, 
-                new_chat_lines=new_chat_lines)
+#     new_chat_lines = []
+#     new_chat_lines.append("Interviewer: " + completion_args_to_use_for_interview['interviewer_dialogue'])
+#     # new_chat_lines.append(get_user_input())
+#     return dict(routing_value=None, 
+#                 new_chat_lines=new_chat_lines)
 
 
 def route_answer_to_confirm_what_applicant_did(validate_async=True, chat_history_by_section=[[]], **kwargs):
@@ -404,6 +418,34 @@ def ask_why_applicant_picked_X_over_Y(validate_async=True, chat_history_by_secti
     # new_chat_lines.append(get_user_input())
     return dict(routing_value=None, 
                 new_chat_lines=new_chat_lines)
+
+
+def validate_answer_devils_advocate(carryover_data, validate_async=True, chat_history_by_section=[[]], **kwargs):
+    model_name = "validate_answer_devils_advocate"
+    prompt_args = dict(what_applicant_did_for_each_section=carryover_data['what_interviewer_thinks_applicant_has_done_in_ipynb'],
+                    objectives_and_constraints=carryover_data['data_challenge_objectives_and_contraints'],
+                    insights=carryover_data['insights'],
+                    current_section_chat=prepare_chat_history(chat_history_by_section[-1]),
+                    is_completion_correct=1)
+    return run_node(node_type="validate", 
+                    model_name=model_name, 
+                    prompt_args=prompt_args, 
+                    other_args=kwargs, 
+                    validate_async=validate_async)
+
+
+def ask_devils_advocate_question(carryover_data, validate_async=True, chat_history_by_section=[[]], **kwargs):
+    model_name = "ask_devils_advocate_question"
+    prompt_args = dict(what_applicant_did_for_each_section=carryover_data['what_interviewer_thinks_applicant_has_done_in_ipynb'],
+                    objectives_and_constraints=carryover_data['data_challenge_objectives_and_contraints'],
+                    insights=carryover_data['insights'],
+                    current_section_chat=prepare_chat_history(chat_history_by_section[-1]),
+                    is_completion_correct=1)
+    return run_node(node_type="ask", 
+                model_name=model_name, 
+                prompt_args=prompt_args, 
+                other_args=kwargs, 
+                validate_async=validate_async)
 
 
 def clarify_question_on_how_it_works(current_section_name, carryover_data, validate_async=True, chat_history_by_section=[[]], **kwargs):

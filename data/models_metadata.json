@@ -178,11 +178,46 @@
                         "delimiter": "Subpoint: "
                     }
                 },
-                "kshot_header": "Interviewer is interviewing Applicant for a job as a Data Scientist.\nInterviewer validates Applicant's answer to a question in the following format:\n\nContext:\n$<a summary of the techniques the applicant has used for each section of the interview, the insights gained from any analysis, the objective of the case study, and any constraints/requirements to applicant's solution>\n\nCurrent section chat:\n$<Conversation so far between Interviewer and Applicant. This may be empty.>\n\nDetails:\nIs validation correct: $<1 or 0 - whether Interviewer's validation of applicant's response is correct or not>\n###\nValidation of response: $<whether Applicant's response is -1=Applicant has not given answer yet / 0=Applicant Did Not Understand question / 1=applicant has given an answer>\nApplicant justifications:\n$<The subpoints applicant makes in their response to interviewer's question, in the following format (one line for each subpoint): \"Subpoint: <subpoint> <interviewer's assessment of whether that subpoint is correct (1), incorrect (-1), or irrelevant (0)> <Reason for why the subpoint is incorrect, if it is incorrect. If it is valid/irrelevant, output \"NA\">\". If applicant makes no subpoints, output \"NA\">\nNumber of correct, incorrect, irrelevant subpoints: $<the number of correct subpoints applicant made>, $<the number of incorrect subpoints applicant made>, $<the number of irrelevant subpoints applicant made>\n\n\nBelow are some correct examples:\n\n",
+                "kshot_header": "Interviewer is interviewing Applicant for a job as a Data Scientist.\nInterviewer validates Applicant's answer to the question of why they picked their approach over another, in the following format:\n\nContext:\n$<a summary of the techniques the applicant has used for each section of the interview, the insights gained from any analysis, the objective of the case study, and any constraints/requirements to applicant's solution>\n\nCurrent section chat:\n$<Conversation so far between Interviewer and Applicant. This may be empty.>\n\nDetails:\nIs validation correct: $<1 or 0 - whether Interviewer's validation of applicant's response is correct or not>\n###\nValidation of response: $<whether Applicant's response is -1=Applicant has not given answer yet / 0=Applicant Did Not Understand question / 1=applicant has given an answer>\nApplicant justifications:\n$<The subpoints applicant makes in their response to interviewer's question, in the following format (one line for each subpoint): \"Subpoint: <subpoint> <interviewer's assessment of whether that subpoint is correct (1), incorrect (-1), or irrelevant (0)> <Reason for why the subpoint is incorrect, if it is incorrect. If it is valid/irrelevant, output \"NA\">\". If applicant makes no subpoints, output \"NA\">\nNumber of correct, incorrect, irrelevant subpoints: $<the number of correct subpoints applicant made>, $<the number of incorrect subpoints applicant made>, $<the number of irrelevant subpoints applicant made>\n\n\nBelow are some correct examples:\n\n",
                 "finetuned_model_name": null,
                 "stop_sequence": "$$$",
                 "model_name": "validate_why_applicant_picked_X_over_Y",
                 "model_version": "24.01.23"
+            }
+        }
+    },
+    "validate_answer_devils_advocate": {
+        "best_model_version": "27.01.23",
+        "models": {
+            "27.01.23": {
+                "prompt_template": "What applicant did for each section:\n{what_applicant_did_for_each_section}\n\nObjectives/Constraints:\n{objectives_and_constraints}\n\nInsights:\n{insights}\n\nCurrent section chat:\n{current_section_chat}\n\nDetails:\nIs validation correct: {is_completion_correct}\n###\n",
+                "completion_template": "Validation of response: {validation_of_response}\n\nApplicant justifications:\n{applicant_justifications}\n\nNumber of correct, incorrect, irrelevant subpoints: {num_correct_subpoints}, {num_incorrect_subpoints}, {num_irrelevant_subpoints}",
+                "nested_completion_templates": {
+                    "applicant_justifications": {
+                        "template": "<{subpoint}><{validation_of_subpoint}><{reason_for_validation}>",
+                        "delimiter": "Subpoint: "
+                    }
+                },
+                "kshot_header": "Interviewer is interviewing Applicant for a job as a Data Scientist.\nInterviewer validates Applicant's answer to the question \"But the issue with your approach is <>. Do you still think it is the optimal choice?\" in the following format:\n\nWhat applicant did for each section:\n$<a summary of the techniques the applicant has used for each section of the interview>\n\nObjectives/Constraints:\n$<the objective of the case study, and any constraints/requirements to applicant's solution>\n\nInsights:\n$<any insights about the problem>\n\nCurrent section chat:\n$<Conversation so far between Interviewer and Applicant>\n\nDetails:\nIs validation correct: $<1 or 0 - whether Interviewer's validation of applicant's response is correct or not>\n###\nValidation of response: $<whether Applicant's response is -1=Applicant has not given answer yet / 0=Applicant Did Not Understand question / 1=applicant has given an answer>\n\nApplicant justifications:\n$<The subpoints applicant makes in their response to interviewer's question about whether their approach is the optimal choice, in the following format (one line for each subpoint): \"Subpoint: <subpoint> <interviewer's assessment of whether that subpoint is correct (1), incorrect (-1), or irrelevant (0).> <Reason for why the subpoint is incorrect, if it is incorrect. If it is valid/irrelevant, output \"NA\">\". If applicant makes no subpoints, output \"NA\">\n\nNumber of correct, incorrect, irrelevant subpoints: $<the number of correct subpoints applicant made>, $<the number of incorrect subpoints applicant made>, $<the number of irrelevant subpoints applicant made>\n\n\nBelow are some correct examples:\n\n",
+                "finetuned_model_name": null,
+                "stop_sequence": "$$$",
+                "model_name": "validate_answer_devils_advocate",
+                "model_version": "27.01.23"
+            }
+        }
+    },
+    "ask_devils_advocate_question": {
+        "best_model_version": "27.01.23",
+        "models": {
+            "27.01.23": {
+                "prompt_template": "What applicant did for each section:\n{what_applicant_did_for_each_section}\n\nObjectives/Constraints:\n{objectives_and_constraints}\n\nInsights:\n{insights}\n\nCurrent section chat:\n{current_section_chat}\n\nDetails:\nIs question correct: {is_completion_correct}\n###\n",
+                "completion_template": "Subject 1: {subject_1}\nSubject 2: {subject_2}\nDisadvantage of using Subject 1: {disadvantage_of_using_subject_1}\nInterviewer: {interviewer_dialogue}",
+                "nested_completion_templates": {},
+                "kshot_header": "Interviewer is interviewing Applicant for a job as a Data Scientist.\nInterviewer asks Applicant a question similar to \"But the issue with your approach is <>. Do you still think it is the optimal choice?\" in the following format:\n\nWhat applicant did for each section:\n$<a summary of the techniques the applicant has used for each section of the interview>\n\nObjectives/Constraints:\n$<the objective of the case study, and any constraints/requirements to applicant's solution>\n\nInsights:\n$<any insights about the problem>\n\nCurrent section chat:\n$<Conversation so far between Interviewer and Applicant>\n\nDetails:\nIs validation correct: $<1 or 0 - whether Interviewer's validation of applicant's response is correct or not>\n###\nSubject 1: $<approach applicant chose to use>\nSubject 2: $<approach applicant considered using, but decided not to. If applicant didn't consider any other approaches, this should be 'NA'>\nDisadvantage of using Subject 1: $<a disadvantage/negative implication of using the applicant's chosen approach, given the objectives/constrains of the problem and any insights we have about the data. This must be something that has not been mentioned already in the conversation.>\nInterviewer: $<Interviewer's dialogue on the distadvantage of using the applicant's chosen approach, and whether the applicant still thinks their approach is optimal>\n\nBelow are some correct examples:\n\n",
+                "finetuned_model_name": null,
+                "stop_sequence": "$$$",
+                "model_name": "ask_devils_advocate_question",
+                "model_version": "27.01.23"
             }
         }
     }

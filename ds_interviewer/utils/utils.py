@@ -127,11 +127,32 @@ def get_feedback(starting_tag):
 #     return gpt_response
 
 
-def get_label_for_correct_or_incorrect_completion():
-    label = input("Is completion correct? (1/0): ")
-    label = int(label)
-    # TODO: add assert to make sure it is either 1 or 0.
-    return label
+def get_label_for_correct_or_incorrect_completion(show_error_message=False):
+    prompt = "{}Is completion correct? (1/0): ".format("Invalid Input. " if show_error_message else "")
+    user_input = input(prompt)
+    if user_input in ["0", "1"]:
+        return int(user_input)
+    else:
+        return get_label_for_correct_or_incorrect_completion(True)
+
+
+def ask_user_if_they_want_to_validate_now(show_error_message=False):
+    prompt = "{}Do you want to validate this observation now? (1/0): ".format("Invalid Input. " if show_error_message else "")
+    user_input = input(prompt)
+    if user_input in ["0", "1"]:
+        return int(user_input)
+    else:
+        return ask_user_if_they_want_to_validate_now(True)
+
+
+def get_multiline_input_from_user(key):
+    user_multiline_input_list = []
+    user_input = None
+    while user_input != "":
+        user_input = input("{}: ".format(key))
+        user_multiline_input_list.append(user_input)
+    user_multiline_input = "\n".join(user_multiline_input_list).strip()
+    return user_multiline_input
 
 
 def get_label_for_validating_answer_completion():
