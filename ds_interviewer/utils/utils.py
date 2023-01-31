@@ -348,3 +348,26 @@ def prepare_completion_using_nested_args(completion_args, model_metadata):
     # then format the whole completion template
     completion = model_metadata['completion_template'].format(**formatted_completion_args)
     return completion
+
+
+def deep_get(d, keys, default=None):
+    """
+    Example:
+        d = {'meta': {'status': 'OK', 'status_code': 200}}
+        deep_get(d, ['meta', 'status_code'])          # => 200
+        deep_get(d, ['garbage', 'status_code'])       # => None
+        deep_get(d, ['meta', 'garbage'], default='-') # => '-'
+    """
+    assert type(keys) is list
+    if type(d) != dict:
+        return default
+    if len(keys) == 0:
+        return d
+    return deep_get(d.get(keys[0]), keys[1:], default)
+
+
+def deep_set():
+    """
+    set key value pair in a nested dictionary.
+    """
+    pass

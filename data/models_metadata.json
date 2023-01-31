@@ -235,5 +235,25 @@
                 "model_version": "29.01.23"
             }
         }
+    },
+    "validate_what_applicant_would_choose_given_requirement": {
+        "best_model_version": "30.01.23",
+        "models": {
+            "30.01.23": {
+                "prompt_template": "Task/Objectives/Constraints:\n{objectives_and_constraints}\n\nWhat applicant did for each section:\n{what_applicant_did_for_each_section}\n\nInsights:\n{insights}\n\nCurrent section chat:\n{current_section_chat}\n\nIs validation correct: {is_completion_correct}\n###\n",
+                "completion_template": "Validation of response: {validation_of_response}\nApplicant choice: {applicant_choice}\n\nApplicant justifications:\n{applicant_justifications}\n\nNumber of correct, incorrect, irrelevant subpoints: {num_correct_subpoints}, {num_incorrect_subpoints}, {num_irrelevant_subpoints}",
+                "nested_completion_templates": {
+                    "applicant_justifications": {
+                        "template": "<{subpoint}><{validation_of_subpoint}><{reason_for_validation}>",
+                        "delimiter": "Subpoint: "
+                    }
+                },
+                "kshot_header": "Interviewer is interviewing Applicant for a job as a Data Scientist.\nInterviewer validates Applicant's answer to the question \"Which approach would you choose if you had <> constraint/requirement/context, and why?\" in the following format:\n\nTask/Objectives/Constraints:\n$<the problem statement, the objective of the case study, and any constraints/requirements to applicant's solution>\n\nWhat applicant did for each section:\n$<a summary of the techniques the applicant has used for each section of the interview>\n\nInsights:\n$<any insights about the data/domain/client/user>\n\nCurrent section chat:\n$<Conversation so far between Interviewer and Applicant>\n\nIs validation correct: $<1 or 0 - whether Interviewer's validation of applicant's response is correct or not>\n###\nValidation of response: $<whether Applicant's response is -1=Applicant has not given answer yet / 0=Applicant Did Not Understand question / 1=applicant has given an answer>\nApplicant choice: $<The approach applicant chose given the interviewer's scenario. If applicant has not given answer yet, \"NA\">\n\nApplicant justifications:\n$<The subpoints applicant makes in their response to interviewer's question, in the following format (one line for each subpoint): \"Subpoint: <subpoint> <interviewer's assessment of whether that subpoint is correct (1), incorrect (-1), or irrelevant (0).> <Reason for why the subpoint is incorrect, if it is incorrect. If it is valid/irrelevant, output \"NA\">\". If applicant makes no subpoints, output \"NA\">\n\nNumber of correct, incorrect, irrelevant subpoints: $<the number of correct subpoints applicant made>, $<the number of incorrect subpoints applicant made>, $<the number of irrelevant subpoints applicant made>\n\n\nBelow are some correct examples:\n\n",
+                "finetuned_model_name": null,
+                "stop_sequence": "$$$",
+                "model_name": "validate_what_applicant_would_choose_given_requirement",
+                "model_version": "30.01.23"
+            }
+        }
     }
 }

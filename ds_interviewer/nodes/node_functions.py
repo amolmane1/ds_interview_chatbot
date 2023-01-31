@@ -1,5 +1,5 @@
 from utils.utils import default_arguments_for_openai_generation, default_arguments_for_openai_validation, create_openai_completion, get_label_for_correct_or_incorrect_completion, \
-    prepare_chat_history, prepare_kshot_prompt_using_levenshtein_distance, get_user_input, parse_completion_args
+    prepare_chat_history, prepare_kshot_prompt_using_levenshtein_distance, get_user_input, parse_completion_args, deep_get
 from utils.models_metadata import get_model_metadata
 from finetuning.prepare_data import submit_observation_for_finetuning_validation
 from parse import parse
@@ -446,6 +446,36 @@ def ask_devils_advocate_question(carryover_data, validate_async=True, chat_histo
                 prompt_args=prompt_args, 
                 other_args=kwargs, 
                 validate_async=validate_async)
+
+
+def ask_what_applicant_would_choose_given_requirement(current_section_name, carryover_data, validate_async=True, chat_history_by_section=[[]], **kwargs):
+    model_name = "ask_what_applicant_would_choose_given_requirement"
+    prompt_args = dict(what_applicant_did_for_each_section=carryover_data['what_interviewer_thinks_applicant_has_done_in_ipynb'],
+                    objectives_and_constraints=carryover_data['data_challenge_objectives_and_contraints'],
+                    insights=carryover_data['insights'],
+                    current_section_chat=prepare_chat_history(chat_history_by_section[-1]),
+                    subject_1=deep_get(carryover_data, ['sections', current_section_name, model_name, 'prompt_args', 'subject_1'], "NA"),
+                    subject_2=deep_get(carryover_data, ['sections', current_section_name, model_name, 'prompt_args', 'subject_2'], "NA"),
+                    is_completion_correct=1)
+    return run_node(node_type="ask", 
+                model_name=model_name, 
+                prompt_args=prompt_args, 
+                other_args=kwargs, 
+                validate_async=validate_async)
+
+
+def validate_what_applicant_would_choose_given_requirement(carryover_data, validate_async=True, chat_history_by_section=[[]], **kwargs):
+    model_name = "validate_what_applicant_would_choose_given_requirement"
+    prompt_args = dict(what_applicant_did_for_each_section=carryover_data['what_interviewer_thinks_applicant_has_done_in_ipynb'],
+                    objectives_and_constraints=carryover_data['data_challenge_objectives_and_contraints'],
+                    insights=carryover_data['insights'],
+                    current_section_chat=prepare_chat_history(chat_history_by_section[-1]),
+                    is_completion_correct=1)
+    return run_node(node_type="validate", 
+                    model_name=model_name, 
+                    prompt_args=prompt_args, 
+                    other_args=kwargs, 
+                    validate_async=validate_async)
 
 
 def clarify_question_on_how_it_works(current_section_name, carryover_data, validate_async=True, chat_history_by_section=[[]], **kwargs):
