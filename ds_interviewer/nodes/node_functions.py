@@ -48,10 +48,10 @@ def share_conclusion_boilerplate(**kwargs):
 def confirm_what_applicant_did(current_section_name, carryover_data, validate_async=True, chat_history_by_section=[[]], **kwargs):
     model_name = "confirm_what_applicant_did"
     prompt_args = dict(
-                    context=carryover_data['what_interviewer_thinks_applicant_has_done_in_ipynb'],
-                    current_section_chat=prepare_chat_history(chat_history_by_section[-1]),
-                    section=current_section_name,
-                    is_completion_correct=1)
+        context=carryover_data['what_interviewer_thinks_applicant_has_done_in_ipynb'],
+        current_section_chat=prepare_chat_history(chat_history_by_section[-1]),
+        section=current_section_name,
+        is_completion_correct=1)
     return run_node(node_type="dialogue", 
                     model_name=model_name, 
                     prompt_args=prompt_args, 
@@ -61,235 +61,87 @@ def confirm_what_applicant_did(current_section_name, carryover_data, validate_as
 
 def route_answer_to_confirm_what_applicant_did(validate_async=True, chat_history_by_section=[[]], **kwargs):
     model_name = "route_answer_to_confirm_what_applicant_did"
-    model_metadata, model_version = get_model_metadata(model_name, kwargs["model_version"] if "model_version" in kwargs.keys() else None)
     prompt_args = dict(
         current_section_chat=prepare_chat_history(chat_history_by_section[-1]),
-                      is_completion_correct=1)
-    observation_prompt = model_metadata['prompt_template'].format(**prompt_args)
-    
-    kshot_prompt = prepare_kshot_prompt_using_levenshtein_distance(model_name=model_name, 
-                                                                   model_metadata=model_metadata, 
-                                                                   prompt_args=prompt_args, 
-                                                                   observation_prompt=observation_prompt)
-    completion = create_openai_completion(kshot_prompt, model_metadata=model_metadata, args=default_arguments_for_openai_validation)
-
-    completion_args = parse(model_metadata['completion_template'], 
-                            completion).named
-    observation_details = dict(model_name=model_name, 
-                               model_version=model_version,
-                               prompt_template=model_metadata['prompt_template'], 
-                               completion_template=model_metadata['completion_template'], 
-                               prompt_args=prompt_args, 
-                               completion_args=completion_args,
-                               prompt = observation_prompt,
-                               completion=completion)
-    completion_args_to_use_for_interview = submit_observation_for_finetuning_validation(observation_details, 
-                                                                                        validate_async=validate_async)
-
-    routing_value = int(completion_args_to_use_for_interview['route'])
-    return dict(routing_value=routing_value, 
-                new_chat_lines=None)
+        is_completion_correct=1)
+    return run_node(node_type="route", 
+                    model_name=model_name, 
+                    prompt_args=prompt_args, 
+                    other_args=kwargs, 
+                    validate_async=validate_async)
 
 
 def ask_what_applicant_did(current_section_name, carryover_data, validate_async=True, chat_history_by_section=[[]], **kwargs):
     model_name = "ask_what_applicant_did"
-    model_metadata, model_version = get_model_metadata(model_name, kwargs["model_version"] if "model_version" in kwargs.keys() else None)
     prompt_args = dict(
         current_section_chat=prepare_chat_history(chat_history_by_section[-1]),
-                      subject=current_section_name,
-                      is_completion_correct=1)
-    observation_prompt = model_metadata['prompt_template'].format(**prompt_args)
-    
-    kshot_prompt = prepare_kshot_prompt_using_levenshtein_distance(model_name=model_name, 
-                                                                   model_metadata=model_metadata, 
-                                                                   prompt_args=prompt_args, 
-                                                                   observation_prompt=observation_prompt)
-    completion = create_openai_completion(kshot_prompt, model_metadata=model_metadata, args=default_arguments_for_openai_generation)
-    
-    completion_args = parse(model_metadata['completion_template'], 
-                            completion).named
-    observation_details = dict(model_name=model_name, 
-                               model_version=model_version,
-                               prompt_template=model_metadata['prompt_template'], 
-                               completion_template=model_metadata['completion_template'], 
-                               prompt_args=prompt_args, 
-                               completion_args=completion_args,
-                               prompt = observation_prompt,
-                               completion=completion)
-    completion_args_to_use_for_interview = submit_observation_for_finetuning_validation(observation_details, 
-                                                                                        validate_async=validate_async)
-
-    new_chat_lines = []
-    new_chat_lines.append("Interviewer: " + completion_args_to_use_for_interview['interviewer_dialogue'])
-    # new_chat_lines.append(get_user_input())
-    return dict(routing_value=None, 
-                new_chat_lines=new_chat_lines)
+        subject=current_section_name,
+        is_completion_correct=1)
+    return run_node(node_type="dialogue", 
+                model_name=model_name, 
+                prompt_args=prompt_args, 
+                other_args=kwargs, 
+                validate_async=validate_async)
 
 
 def route_answer_to_ask_what_applicant_did(validate_async=True, chat_history_by_section=[[]], **kwargs):
     model_name = "route_answer_to_ask_what_applicant_did"
-    model_metadata, model_version = get_model_metadata(model_name, kwargs["model_version"] if "model_version" in kwargs.keys() else None)
     prompt_args = dict(
         current_section_chat=prepare_chat_history(chat_history_by_section[-1]),
-                      is_completion_correct=1)
-    observation_prompt = model_metadata['prompt_template'].format(**prompt_args)
-    
-    kshot_prompt = prepare_kshot_prompt_using_levenshtein_distance(model_name=model_name, 
-                                                                   model_metadata=model_metadata, 
-                                                                   prompt_args=prompt_args, 
-                                                                   observation_prompt=observation_prompt)
-    completion = create_openai_completion(kshot_prompt, model_metadata=model_metadata, args=default_arguments_for_openai_validation)
-
-    completion_args = parse(model_metadata['completion_template'], 
-                            completion).named
-    observation_details = dict(model_name=model_name, 
-                               model_version=model_version,
-                               prompt_template=model_metadata['prompt_template'], 
-                               completion_template=model_metadata['completion_template'], 
-                               prompt_args=prompt_args, 
-                               completion_args=completion_args,
-                               prompt = observation_prompt,
-                               completion=completion)
-    completion_args_to_use_for_interview = submit_observation_for_finetuning_validation(observation_details, 
-                                                                                        validate_async=validate_async)
-
-    routing_value = int(completion_args_to_use_for_interview['route'])
-    return dict(routing_value=routing_value, 
-                new_chat_lines=None)
+        is_completion_correct=1)
+    return run_node(node_type="route", 
+                    model_name=model_name, 
+                    prompt_args=prompt_args, 
+                    other_args=kwargs, 
+                    validate_async=validate_async)
 
 
 def ask_how_it_works(current_section_name, carryover_data, validate_async=True, chat_history_by_section=[[]], **kwargs):
     model_name = "ask_how_it_works"
-    model_metadata, model_version = get_model_metadata(model_name, kwargs["model_version"] if "model_version" in kwargs else None)
     prompt_args = dict(current_section_chat=prepare_chat_history(chat_history_by_section[-1]),
                        subject=kwargs['subject'] if 'subject' in kwargs else 'NA',
                       question_type="how it works",
                       is_completion_correct=1)
-    observation_prompt = model_metadata['prompt_template'].format(**prompt_args)
-    
-    kshot_prompt = prepare_kshot_prompt_using_levenshtein_distance(model_name=model_name, 
-                                                                   model_metadata=model_metadata, 
-                                                                   prompt_args=prompt_args, 
-                                                                   observation_prompt=observation_prompt)
-    completion = create_openai_completion(kshot_prompt, model_metadata=model_metadata, args=default_arguments_for_openai_generation)
-    
-    completion_args = parse(model_metadata['completion_template'], 
-                            completion).named
-    observation_details = dict(model_name=model_name, 
-                               model_version=model_version,
-                               prompt_template=model_metadata['prompt_template'], 
-                               completion_template=model_metadata['completion_template'], 
-                               prompt_args=prompt_args, 
-                               completion_args=completion_args,
-                               prompt = observation_prompt,
-                               completion=completion)
-    completion_args_to_use_for_interview = submit_observation_for_finetuning_validation(observation_details, 
-                                                                                        validate_async=validate_async)
-
-    new_chat_lines = []
-    new_chat_lines.append("Interviewer: " + completion_args_to_use_for_interview['interviewer_dialogue'])
-    # new_chat_lines.append(get_user_input())
-    return dict(routing_value=None, 
-                new_chat_lines=new_chat_lines)
+    return run_node(node_type="dialogue", 
+                    model_name=model_name, 
+                    prompt_args=prompt_args, 
+                    other_args=kwargs, 
+                    validate_async=validate_async)
 
 
 def validate_answer_how_it_works(current_section_name, carryover_data, validate_async=True, chat_history_by_section=[[]], **kwargs):
     model_name = "validate_answer_how_it_works"
-    model_metadata, model_version = get_model_metadata(model_name, kwargs["model_version"] if "model_version" in kwargs.keys() else None)
-    
     prompt_args = dict(current_section_chat=prepare_chat_history(chat_history_by_section[-1]),
-                      question_type="how it works",
-                      is_completion_correct=1)
-    observation_prompt = model_metadata['prompt_template'].format(**prompt_args)
-    
-    kshot_prompt = prepare_kshot_prompt_using_levenshtein_distance(model_name=model_name, 
-                                                               model_metadata=model_metadata, 
-                                                               prompt_args=prompt_args, 
-                                                               observation_prompt=observation_prompt)
-    completion = create_openai_completion(kshot_prompt, model_metadata=model_metadata, args=default_arguments_for_openai_validation)
-    
-    # this assumes completion always follows the template. what if it doesn't?
-    completion_args = parse(model_metadata['completion_template'], 
-                            completion).named
-    observation_details = dict(model_name=model_name, 
-                               model_version=model_version,
-                               prompt_template=model_metadata['prompt_template'], 
-                               completion_template=model_metadata['completion_template'], 
-                               prompt_args=prompt_args, 
-                               completion_args=completion_args,
-                               prompt = observation_prompt,
-                               completion=completion)
-    completion_args_to_use_for_interview = submit_observation_for_finetuning_validation(observation_details, 
-                                                                                        validate_async=validate_async)
-
-    routing_value = int(completion_args_to_use_for_interview['validation_of_response'])
-    return dict(routing_value=routing_value, 
-                new_chat_lines=None)
+                    question_type="how it works",
+                    is_completion_correct=1)
+    return run_node(node_type="validate", 
+                    model_name=model_name, 
+                    prompt_args=prompt_args, 
+                    other_args=kwargs, 
+                    validate_async=validate_async)
 
 
 def route_answer_to_what_other_options_applicant_considered(carryover_data, validate_async=True, chat_history_by_section=[[]], **kwargs):
     model_name = "route_answer_to_what_other_options_applicant_considered"
-    model_metadata, model_version = get_model_metadata(model_name, kwargs["model_version"] if "model_version" in kwargs.keys() else None)
     prompt_args = dict(
         current_section_chat=prepare_chat_history(chat_history_by_section[-1]),
-                      is_completion_correct=1)
-    observation_prompt = model_metadata['prompt_template'].format(**prompt_args)
-    
-    kshot_prompt = prepare_kshot_prompt_using_levenshtein_distance(model_name=model_name, 
-                                                                   model_metadata=model_metadata, 
-                                                                   prompt_args=prompt_args, 
-                                                                   observation_prompt=observation_prompt)
-    completion = create_openai_completion(kshot_prompt, model_metadata=model_metadata, args=default_arguments_for_openai_validation)
-
-    completion_args = parse(model_metadata['completion_template'], 
-                            completion).named
-    observation_details = dict(model_name=model_name, 
-                               model_version=model_version,
-                               prompt_template=model_metadata['prompt_template'], 
-                               completion_template=model_metadata['completion_template'], 
-                               prompt_args=prompt_args, 
-                               completion_args=completion_args,
-                               prompt = observation_prompt,
-                               completion=completion)
-    completion_args_to_use_for_interview = submit_observation_for_finetuning_validation(observation_details, 
-                                                                                        validate_async=validate_async)
-
-    routing_value = int(completion_args_to_use_for_interview['route'])
-    return dict(routing_value=routing_value, 
-                new_chat_lines=None)
+        is_completion_correct=1)
+    return run_node(node_type="route", 
+                    model_name=model_name, 
+                    prompt_args=prompt_args, 
+                    other_args=kwargs, 
+                    validate_async=validate_async)
 
 
 def ask_what_other_options_applicant_considered(carryover_data, validate_async=True, chat_history_by_section=[[]], **kwargs):
     model_name = "ask_what_other_options_applicant_considered"
-    model_metadata, model_version = get_model_metadata(model_name, kwargs["model_version"] if "model_version" in kwargs else None)
     prompt_args = dict(current_section_chat=prepare_chat_history(chat_history_by_section[-1]),
                       is_completion_correct=1)
-    observation_prompt = model_metadata['prompt_template'].format(**prompt_args)
-    
-    kshot_prompt = prepare_kshot_prompt_using_levenshtein_distance(model_name=model_name, 
-                                                                   model_metadata=model_metadata, 
-                                                                   prompt_args=prompt_args, 
-                                                                   observation_prompt=observation_prompt)
-    completion = create_openai_completion(kshot_prompt, model_metadata=model_metadata, args=default_arguments_for_openai_generation)
-    
-    completion_args = parse(model_metadata['completion_template'], 
-                            completion).named
-    observation_details = dict(model_name=model_name, 
-                               model_version=model_version,
-                               prompt_template=model_metadata['prompt_template'], 
-                               completion_template=model_metadata['completion_template'], 
-                               prompt_args=prompt_args, 
-                               completion_args=completion_args,
-                               prompt = observation_prompt,
-                               completion=completion)
-    completion_args_to_use_for_interview = submit_observation_for_finetuning_validation(observation_details, 
-                                                                                        validate_async=validate_async)
-
-    new_chat_lines = []
-    new_chat_lines.append("Interviewer: " + completion_args_to_use_for_interview['interviewer_dialogue'])
-    # new_chat_lines.append(get_user_input())
-    return dict(routing_value=None, 
-                new_chat_lines=new_chat_lines)
+    return run_node(node_type="dialogue", 
+                model_name=model_name, 
+                prompt_args=prompt_args, 
+                other_args=kwargs, 
+                validate_async=validate_async)
 
 
 def validate_why_applicant_picked_X_over_Y(carryover_data, validate_async=True, chat_history_by_section=[[]], **kwargs):
@@ -309,36 +161,13 @@ def validate_why_applicant_picked_X_over_Y(carryover_data, validate_async=True, 
 
 def ask_why_applicant_picked_X_over_Y(validate_async=True, chat_history_by_section=[[]], **kwargs):
     model_name = "ask_why_applicant_picked_X_over_Y"
-    model_metadata, model_version = get_model_metadata(model_name, kwargs["model_version"] if "model_version" in kwargs.keys() else None)
-
     prompt_args = dict(current_section_chat=prepare_chat_history(chat_history_by_section[-1]),
-                    is_completion_correct=1)
-    observation_prompt = model_metadata['prompt_template'].format(**prompt_args)
-    
-    kshot_prompt = prepare_kshot_prompt_using_levenshtein_distance(model_name=model_name, 
-                                                               model_metadata=model_metadata, 
-                                                               prompt_args=prompt_args, 
-                                                               observation_prompt=observation_prompt)
-    completion = create_openai_completion(kshot_prompt, model_metadata=model_metadata, args=default_arguments_for_openai_validation)
-    
-    completion_args = parse(model_metadata['completion_template'], 
-                            completion).named
-    observation_details = dict(model_name=model_name, 
-                               model_version=model_version,
-                               prompt_template=model_metadata['prompt_template'], 
-                               completion_template=model_metadata['completion_template'], 
-                               prompt_args=prompt_args, 
-                               completion_args=completion_args,
-                               prompt = observation_prompt,
-                               completion=completion)
-    completion_args_to_use_for_interview = submit_observation_for_finetuning_validation(observation_details, 
-                                                                                        validate_async=validate_async)
-
-    new_chat_lines = []
-    new_chat_lines.append("Interviewer: " + completion_args_to_use_for_interview['interviewer_dialogue'])
-    # new_chat_lines.append(get_user_input())
-    return dict(routing_value=None, 
-                new_chat_lines=new_chat_lines)
+                        is_completion_correct=1)
+    return run_node(node_type="dialogue", 
+                    model_name=model_name, 
+                    prompt_args=prompt_args, 
+                    other_args=kwargs, 
+                    validate_async=validate_async)
 
 
 def validate_answer_devils_advocate(carryover_data, validate_async=True, chat_history_by_section=[[]], **kwargs):

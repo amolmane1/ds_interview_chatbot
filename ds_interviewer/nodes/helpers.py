@@ -10,6 +10,12 @@ def run_validate_node(completion_args_to_use_for_interview):
                 new_chat_lines=None)
 
 
+def run_route_node(completion_args_to_use_for_interview):
+    routing_value = int(completion_args_to_use_for_interview['route'])
+    return dict(routing_value=routing_value, 
+                new_chat_lines=None)
+
+
 def run_dialogue_node(completion_args_to_use_for_interview):
     if "interviewer_dialogue" in completion_args_to_use_for_interview:
         new_chat_lines = ["Interviewer: " + completion_args_to_use_for_interview['interviewer_dialogue']]
@@ -33,6 +39,8 @@ def run_node(node_type, model_name, prompt_args, other_args, validate_async=True
         openai_args = default_arguments_for_openai_generation
     elif node_type == "validate":
         openai_args = default_arguments_for_openai_validation
+    elif node_type == "route":
+        openai_args = default_arguments_for_openai_validation
     completion = create_openai_completion(kshot_prompt, model_metadata=model_metadata, args=openai_args)
     
     completion_args = parse_completion_args(completion, model_metadata)
@@ -51,4 +59,6 @@ def run_node(node_type, model_name, prompt_args, other_args, validate_async=True
         result = run_dialogue_node(completion_args_to_use_for_interview)
     elif node_type == "validate":
         result = run_validate_node(completion_args_to_use_for_interview)
+    elif node_type == "route":
+        result = run_route_node(completion_args_to_use_for_interview)
     return result
