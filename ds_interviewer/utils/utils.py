@@ -350,20 +350,17 @@ def prepare_completion_using_nested_args(completion_args, model_metadata):
     return completion
 
 
-def deep_get(d, keys, default=None):
-    """
-    Example:
-        d = {'meta': {'status': 'OK', 'status_code': 200}}
-        deep_get(d, ['meta', 'status_code'])          # => 200
-        deep_get(d, ['garbage', 'status_code'])       # => None
-        deep_get(d, ['meta', 'garbage'], default='-') # => '-'
+def deep_get(var, keys, default_value=None):
+    """Gets appropriate value from a nested dictionary, given a list of hierarchical keys.
     """
     assert type(keys) is list
-    if type(d) != dict:
-        return default
     if len(keys) == 0:
-        return d
-    return deep_get(d.get(keys[0]), keys[1:], default)
+        return var
+    if type(var) != dict:
+        return default_value
+    return deep_get(var.get(keys[0], default_value), 
+                    keys[1:], 
+                    default_value)
 
 
 def deep_set():
