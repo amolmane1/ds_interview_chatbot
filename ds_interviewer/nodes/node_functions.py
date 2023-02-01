@@ -96,7 +96,7 @@ def route_answer_to_ask_what_applicant_did(validate_async=True, chat_history_by_
                     validate_async=validate_async)
 
 
-def ask_how_it_works(current_section_name, carryover_data, validate_async=True, chat_history_by_section=[[]], **kwargs):
+def ask_how_it_works(carryover_data, validate_async=True, chat_history_by_section=[[]], **kwargs):
     model_name = "ask_how_it_works"
     prompt_args = dict(current_section_chat=prepare_chat_history(chat_history_by_section[-1]),
                        subject=kwargs['subject'] if 'subject' in kwargs else 'NA',
@@ -220,6 +220,33 @@ def validate_what_applicant_would_choose_given_requirement(carryover_data, valid
                     objectives_and_constraints=carryover_data['data_challenge_objectives_and_constraints'],
                     insights=carryover_data['insights'],
                     current_section_chat=prepare_chat_history(chat_history_by_section[-1]),
+                    is_completion_correct=1)
+    return run_node(node_type="validate", 
+                    model_name=model_name, 
+                    prompt_args=prompt_args, 
+                    other_args=kwargs, 
+                    validate_async=validate_async)
+
+
+def ask_custom_question(current_section_name, current_node_name, carryover_data, validate_async=True, chat_history_by_section=[[]], **kwargs):
+    model_name = "ask_custom_question"
+    prompt_args = dict(question=deep_get(carryover_data, ['sections', current_section_name, current_node_name, 'prompt_args', 'question']),
+                    is_completion_correct=1)
+    return run_node(node_type="dialogue", 
+                    model_name=model_name, 
+                    prompt_args=prompt_args, 
+                    other_args=kwargs, 
+                    validate_async=validate_async)
+
+
+def validate_answer_to_custom_question(current_section_name, current_node_name, carryover_data, validate_async=True, chat_history_by_section=[[]], **kwargs):
+    model_name = "validate_answer_to_custom_question"
+    prompt_args = dict(what_applicant_did_for_each_section=carryover_data['what_interviewer_thinks_applicant_has_done_in_ipynb'],
+                    objectives_and_constraints=carryover_data['data_challenge_objectives_and_constraints'],
+                    insights=carryover_data['insights'],
+                    current_section_chat=prepare_chat_history(chat_history_by_section[-1]),
+                    question = deep_get(carryover_data, ['sections', current_section_name, current_node_name, 'prompt_args', 'question'], "NA"),
+                    provided_answer = deep_get(carryover_data, ['sections', current_section_name, current_node_name, 'prompt_args', 'provided_answer'], "NA"),
                     is_completion_correct=1)
     return run_node(node_type="validate", 
                     model_name=model_name, 
