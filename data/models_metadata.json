@@ -280,5 +280,59 @@
                 "model_version": "30.01.23"
             }
         }
+    },
+    "ask_custom_question": {
+        "best_model_version": "31.01.23",
+        "models": {
+            "31.01.23": {
+                "prompt_template": "Question: {question}\nIs question correct: {is_completion_correct}\n###\n",
+                "completion_template": "Interviewer: {interviewer_dialogue}",
+                "nested_completion_templates": {},
+                "kshot_header": "Interviewer is interviewing Applicant for a job as a Data Scientist.\nInterviewer asks Applicant a question in the following format:\n\nQuestion: $<question that Interviewer is to ask Applicant>\nIs question correct: $<1 or 0 - whether Interviewer asks the right question (1) or not (0)>\n###\nInterviewer: $<Interviewer's question>\n\nBelow are some correct examples:\n\n",
+                "finetuned_model_name": null,
+                "stop_sequence": "$$$",
+                "model_name": "ask_custom_question",
+                "model_version": "31.01.23"
+            }
+        }
+    },
+    "validate_answer_to_custom_question": {
+        "best_model_version": "31.01.23-1",
+        "models": {
+            "31.01.23": {
+                "prompt_template": "Task/Objectives/Constraints:\n{objectives_and_constraints}\n\nWhat applicant did for each section:\n{what_applicant_did_for_each_section}\n\nInsights:\n{insights}\n\nCurrent section chat:\n{current_section_chat}\n\nProvided answer: \n{provided_answer}\n\nIs validation correct: {is_completion_correct}\n###\n",
+                "completion_template": "Validation of response: {validation_of_response}\n\nCorrect response: \n{correct_response}\n\nApplicant's response:\n{applicants_response}\n\nNumber of correct, incomplete, incorrect, irrelevant subpoints: {num_correct_subpoints}, {num_incomplete_subpoints}, {num_incorrect_subpoints}, {num_irrelevant_subpoints}",
+                "nested_completion_templates": {
+                    "correct_response": {
+                        "template": "<{subpoint}>",
+                        "delimiter": "Subpoint: "
+                    },
+                    "applicants_response": {
+                        "template": "<{subpoint}><{validation_of_subpoint}><{reason_for_validation}>",
+                        "delimiter": "Subpoint: "
+                    }
+                },
+                "kshot_header": "Interviewer is interviewing Applicant for a job as a Data Scientist.\nInterviewer validates Applicant's answer to their last question in the following format:\n\nTask/Objectives/Constraints:\n$<the problem statement, the objective of the case study, and any constraints/requirements to applicant's solution>\n\nWhat applicant did for each section:\n$<a summary of the techniques the applicant has used for each section of the interview>\n\nInsights:\n$<any insights about the data/domain/client/user>\n\nCurrent section chat:\n$<Conversation so far between Interviewer and Applicant>\n\nProvided answer: \n$<The expected response to the question. If this is \"NA\", come up with the correct response under \"Correct response: \". If this has a value, use that to generate \"Correct response: \">\n\nIs validation correct: $<1 or 0 - whether Interviewer's validation of applicant's response is correct or not>\n###\nValidation of response: $<whether Applicant's response is -1=Applicant has not given answer yet / 0=Applicant Did Not Understand question / 1=applicant has given an answer>\n\nCorrect response: \n$<The subpoints in the correct response to interviewer's question, in the following format (one line for each subpoint): \"Subpoint: <subpoint>\". >\n\nApplicant's response:\n$<The subpoints applicant makes in their response to interviewer's question, in the following format (one line for each subpoint): \"Subpoint: <subpoint> <interviewer's assessment of whether that subpoint is correct (2), incomplete(1), incorrect (-1), or irrelevant (0).> <Reason for why the subpoint is incorrect, if it is incorrect. If it is valid/irrelevant, output \"NA\">\". If applicant makes no subpoints, output \"NA\">\n\nNumber of correct, incomplete, incorrect, irrelevant subpoints: $<the number of correct subpoints applicant made>, $<the number of incomplete subpoints applicant made>, $<the number of incorrect subpoints applicant made>, $<the number of irrelevant subpoints applicant made>\n\n\nBelow are some correct examples:\n\n",
+                "finetuned_model_name": null,
+                "stop_sequence": "$$$",
+                "model_name": "validate_answer_to_custom_question",
+                "model_version": "31.01.23"
+            },
+            "31.01.23-1": {
+                "prompt_template": "Task/Objectives/Constraints:\n{objectives_and_constraints}\n\nWhat applicant did for each section:\n{what_applicant_did_for_each_section}\n\nInsights:\n{insights}\n\nCurrent section chat:\n{current_section_chat}\n\nQuestion:\n{question}\n\nProvided answer: \n{provided_answer}\n\nIs validation correct: {is_completion_correct}\n###\n",
+                "completion_template": "Validation of response: {validation_of_response}\nIs question subjective: {is_question_subjective}\n\nSubpoints made / expected: \n{subpoints_made_or_expected}\n\nNumber of correct, missing, incorrect, irrelevant subpoints: {num_correct_subpoints}, {num_missing_subpoints}, {num_incorrect_subpoints}, {num_irrelevant_subpoints}",
+                "nested_completion_templates": {
+                    "subpoints_made_or_expected": {
+                        "template": "<{subpoint}><{validation_of_subpoint}><{reason_for_validation}>",
+                        "delimiter": "Subpoint: "
+                    }
+                },
+                "kshot_header": "Interviewer is interviewing Applicant for a job as a Data Scientist.\nInterviewer validates Applicant's answer to their question in the following format:\n\nTask/Objectives/Constraints:\n$<the problem statement, the objective of the case study, and any constraints/requirements to applicant's solution>\n\nWhat applicant did for each section:\n$<a summary of the techniques the applicant has used for each section of the interview>\n\nInsights:\n$<any insights about the data/domain/client/user>\n\nCurrent section chat:\n$<Conversation so far between Interviewer and Applicant>\n\nQuestion:\n$<the question that applicant is expected to give an answer to. If the answer to this question isn't in \"Current section chat: \", \"Validation of response: \" should be -1>\n\nProvided answer: \n$<The expected response to the question. If this is \"NA\", come up with the expected response under \"Subpoints made / expected: \". If this has a value, use that in \"Subpoints made / expected: \">\n\nIs validation correct: $<1 or 0 - whether Interviewer's validation of applicant's response is correct or not>\n###\nValidation of response: $<whether Applicant's response is -1=Applicant has not given answer yet / 0=Applicant Did Not Understand question / 1=applicant has given an answer>\nIs question subjective: $<\"1\" if the question doesn't have any expected answers, and \"0\" if it does.>\n\nSubpoints made or expected: \n$<The subpoints applicant makes in their response to interviewer's question + the subpoints that are expected to be made in a correct answer for a non-subjective question, but haven't been made by applicant. In the following format (one line for each subpoint): \"Subpoint: <subpoint><interviewer's assessment of whether that subpoint is correct (c), missing (m), incorrect (w), or irrelevant (r).><Reason for why the subpoint is incorrect, if it is incorrect. If it is valid/irrelevant/missing, output \"NA\">\".>\n\nNumber of correct, missing, incorrect, irrelevant subpoints: $<the number of correct subpoints applicant made>, $<if question is objective, the number of subpoints that were missing in applicant's response. If question is subjective, 0>, $<the number of incorrect subpoints applicant made>, $<the number of irrelevant subpoints applicant made>\n\n\nBelow are some correct examples:\n\n",
+                "finetuned_model_name": null,
+                "stop_sequence": "$$$",
+                "model_name": "validate_answer_to_custom_question",
+                "model_version": "31.01.23-1"
+            }
+        }
     }
 }
