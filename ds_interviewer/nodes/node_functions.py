@@ -17,7 +17,7 @@ def share_introduction_boilerplate(**kwargs):
 
 def get_response_from_python_input(**kwargs):
     new_chat_lines = []
-    new_chat_lines.append(get_user_input)
+    new_chat_lines.append(get_user_input())
     return dict(routing_value=None, 
                 new_chat_lines=new_chat_lines)
 
@@ -256,10 +256,12 @@ def validate_answer_to_custom_question(current_section_name, current_node_name, 
 
 
 def clarify_question_on_how_it_works(current_section_name, carryover_data, validate_async=True, chat_history_by_section=[[]], **kwargs):
+    # TODO
     pass
 
 
 def ask_followup_question_on_how_it_works(current_section_name, carryover_data, validate_async=True, chat_history_by_section=[[]], **kwargs):
+    # TODO
     pass
 
 
