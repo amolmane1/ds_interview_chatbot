@@ -297,7 +297,7 @@
         }
     },
     "validate_answer_to_custom_question": {
-        "best_model_version": "31.01.23-1",
+        "best_model_version": "17.04.23-0",
         "models": {
             "31.01.23": {
                 "prompt_template": "Task/Objectives/Constraints:\n{objectives_and_constraints}\n\nWhat applicant did for each section:\n{what_applicant_did_for_each_section}\n\nInsights:\n{insights}\n\nCurrent section chat:\n{current_section_chat}\n\nProvided answer: \n{provided_answer}\n\nIs validation correct: {is_completion_correct}\n###\n",
@@ -332,6 +332,21 @@
                 "stop_sequence": "$$$",
                 "model_name": "validate_answer_to_custom_question",
                 "model_version": "31.01.23-1"
+            },
+            "17.04.23-0": {
+                "prompt_template": "Current section chat:\n{current_section_chat}\n\nQuestion:\n{question}\n\nProvided answer: \n{provided_answer}\n\nIs validation correct: {is_completion_correct}\n###\n",
+                "completion_template": "Validation of response: {validation_of_response}\nIs question subjective: {is_question_subjective}\n\nSubpoints made / expected: \n{subpoints_made_or_expected}\n\nNumber of correct, missing, incorrect, irrelevant subpoints: {num_correct_subpoints}, {num_missing_subpoints}, {num_incorrect_subpoints}, {num_irrelevant_subpoints}",
+                "nested_completion_templates": {
+                    "subpoints_made_or_expected": {
+                        "template": "<{subpoint}><{validation_of_subpoint}><{reason_for_validation}>",
+                        "delimiter": "Subpoint: "
+                    }
+                },
+                "kshot_header": "Interviewer is interviewing Applicant for a job.\nInterviewer validates Applicant's answer to their question in the following format:\n\nCurrent section chat:\n$<Conversation so far between Interviewer and Applicant>\n\nQuestion:\n$<the question that applicant is expected to give an answer to. If this is NA, it is the last question asked by the interviewer. If the answer to this question isn't in \"Current section chat: \", \"Validation of response: \" should be -1>\n\nProvided answer: \n$<The expected response to the question. If this is \"NA\", come up with the expected response under \"Subpoints made / expected: \". If this has a value, use that in \"Subpoints made / expected: \">\n\nIs validation correct: $<1 or 0 - whether Interviewer's validation of applicant's response is correct or not>\n###\nValidation of response: $<whether Applicant's response is -1=Applicant has not given answer yet / 0=Applicant Did Not Understand question / 1=applicant has given an answer>\nIs question subjective: $<\"1\" if the question is open-eneded, and \"0\" if there is a single correct answer.>\n\nSubpoints made or expected: \n$<The subpoints applicant makes in their response to interviewer's question + the subpoints that are expected to be made in a correct answer, but haven't been made by applicant. In the following format (one line for each subpoint): \"Subpoint: <subpoint><interviewer's assessment of whether that subpoint is correct (c), missing (m), incorrect (w), or irrelevant (r).><Reason for why the subpoint is incorrect, if it is incorrect. If it is valid/irrelevant/missing, output \"NA\">\".>\n\nNumber of correct, missing, incorrect, irrelevant subpoints: $<the number of correct subpoints applicant made>, $<if question is objective, the number of subpoints that were missing in applicant's response. If question is subjective, 0>, $<the number of incorrect subpoints applicant made>, $<the number of irrelevant subpoints applicant made>\n\n\nBelow are some correct examples:\n\n",
+                "finetuned_model_name": null,
+                "stop_sequence": "$$$",
+                "model_name": "validate_answer_to_custom_question",
+                "model_version": "17.04.23-0"
             }
         }
     }
