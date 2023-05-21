@@ -72,24 +72,24 @@ def create_screening_interview_flowchart():
                         )
     section_graph.add_node("validate_answer_to_custom_question-1", function=validate_answer_to_custom_question)
 
-    # section_graph.add_node("ask_custom_question-2", function=ask_custom_question)
-    # section_graph.add_node("get_applicant_response-2", 
-    #                        function=get_response_from_python_input,
-    #                     #    function=get_response_from_applicant_persona
-    #                     )
-    # section_graph.add_node("validate_answer_to_custom_question-2", function=validate_answer_to_custom_question)
+    section_graph.add_node("ask_custom_question-2", function=ask_custom_question)
+    section_graph.add_node("get_applicant_response-2", 
+                           function=get_response_from_python_input,
+                        #    function=get_response_from_applicant_persona
+                        )
+    section_graph.add_node("validate_answer_to_custom_question-2", function=validate_answer_to_custom_question)
 
     section_graph.add_node("empty_node", function=empty_node)
     
     # create edges
     section_graph.add_edge("ask_custom_question-1", "get_applicant_response-1")
     section_graph.add_edge("get_applicant_response-1", "validate_answer_to_custom_question-1")
-    # section_graph.add_edge("validate_answer_to_custom_question-1", "ask_custom_question-2", passthrough_values=[0,1,2,3])
-    section_graph.add_edge("validate_answer_to_custom_question-1", "empty_node", passthrough_values=[0,1,2,3])
+    section_graph.add_edge("validate_answer_to_custom_question-1", "ask_custom_question-2", passthrough_values=[0,1,2,3])
+    # section_graph.add_edge("validate_answer_to_custom_question-1", "empty_node", passthrough_values=[0,1,2,3])
 
-    # section_graph.add_edge("ask_custom_question-2", "get_applicant_response-2")
-    # section_graph.add_edge("get_applicant_response-2", "validate_answer_to_custom_question-2")
-    # section_graph.add_edge("validate_answer_to_custom_question-2", "empty_node", passthrough_values=[0,1,2,3])
+    section_graph.add_edge("ask_custom_question-2", "get_applicant_response-2")
+    section_graph.add_edge("get_applicant_response-2", "validate_answer_to_custom_question-2")
+    section_graph.add_edge("validate_answer_to_custom_question-2", "empty_node", passthrough_values=[0,1,2,3])
 
     # general
     interview_graph.nodes["general"]['graph'] = deepcopy(section_graph)
